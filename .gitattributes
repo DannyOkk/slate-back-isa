@@ -1,2 +1,14 @@
+# Normalización de saltos de línea para compatibilidad Windows / Linux
+* text=auto
+
+# Ejecutables y archivos de build en Linux / Docker
 /mvnw text eol=lf
+Dockerfile text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Scripts Windows
 *.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf

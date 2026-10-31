@@ -1,0 +1,16 @@
+meta {
+  name: 03 - Validar Token JWT
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/auth/validate
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwtToken}}
+}
+

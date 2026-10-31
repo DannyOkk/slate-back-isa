@@ -1,0 +1,31 @@
+meta {
+  name: 01 - Registro de Usuario
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Comerciante Demo",
+    "email": "demo@slate.com",
+    "password": "PasswordSeguro123!",
+    "phone": "+5492615551234"
+  }
+}
+
+script:post-response {
+  if (res.status === 201 && res.body.token) {
+    bru.setEnvVar("jwtToken", res.body.token);
+  }
+}
+

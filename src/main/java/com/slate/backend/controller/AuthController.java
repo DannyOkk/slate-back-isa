@@ -61,6 +61,15 @@ public class AuthController {
         return ResponseEntity.ok(userService.getCurrentUserProfile());
     }
 
+    /**
+     * GET /api/auth/validate
+     * Valida el token JWT del header Authorization y devuelve los datos del usuario autenticado.
+     */
+    @GetMapping("/validate")
+    public ResponseEntity<UserProfileResponse> validateToken() {
+        return ResponseEntity.ok(userService.getCurrentUserProfile());
+    }
+
     @PutMapping("/profile")
     public ResponseEntity<UserProfileResponse> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request) {

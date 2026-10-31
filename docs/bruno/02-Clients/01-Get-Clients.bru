@@ -1,0 +1,16 @@
+meta {
+  name: 01 - Obtener Todos los Clientes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/clients
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwtToken}}
+}
+

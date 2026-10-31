@@ -1,0 +1,10 @@
+{
+  "version": "1",
+  "name": "Slate API - ISA UM",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
+

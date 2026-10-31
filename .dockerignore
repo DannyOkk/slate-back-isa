@@ -1,0 +1,37 @@
+# Control de versiones
+.git
+.gitignore
+.gitattributes
+
+# Secretos y variables de entorno locales (NUNCA incluir en imágenes)
+.env
+.env.*
+!.env.example
+
+# Artefactos compilados locales (se compila dentro del contenedor)
+target/
+build/
+*.class
+
+# Herramientas y configuraciones de IDEs
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+
+# Documentación y pruebas de API
+README.md
+ROADMAP.md
+docs/
+*.md
+
+# Logs y temporales
+*.log
+tmp/
+.DS_Store
+Thumbs.db
+
