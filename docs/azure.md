@@ -210,3 +210,149 @@ La validación se completó correctamente:
 - `slate-db-isa` quedó en estado `Stopped`.
 
 El usuario de prueba se creó en la base cloud. La contraseña no se documenta ni se almacena en el repositorio.
+
+## Fase 12: gestión operativa de Container Apps
+
+La Container App `slate-back-isa` se opera separadamente de `goat-grup-one`.
+Antes de cada operación que pueda activar cómputo hay que revisar el crédito y
+aceptar el costo temporal. PostgreSQL debe estar `Ready` antes de activar la
+aplicación.
+
+### Consultar estado
+
+```powershell
+az containerapp show `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --query "{name:name,status:properties.runningStatus,minReplicas:properties.template.scale.minReplicas,image:properties.template.containers[0].image}" `
+  --output json
+
+az containerapp revision list `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --query "[].{name:name,active:properties.active,health:properties.healthState,traffic:properties.trafficWeight}" `
+  --output table
+
+az postgres flexible-server show `
+  --name slate-db-isa `
+  --resource-group universidad `
+  --query "{name:name,state:state}" `
+  --output json
+```
+
+### Iniciar y detener
+
+En esta suscripción/entorno, `az containerapp start` no está disponible. Para
+activar la aplicación:
+
+```powershell
+az containerapp update `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --min-replicas 1 `
+  --max-replicas 1 `
+  --only-show-errors
+```
+
+Si la aplicación fue detenida administrativamente y continúa en `Stopped`, se
+puede crear/reactivar la revision con la imagen actual:
+
+```powershell
+az containerapp update `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --image acringenieria.azurecr.io/slate-backend:e50018636cdc `
+  --min-replicas 1 `
+  --max-replicas 1 `
+  --only-show-errors
+```
+
+Para apagar sin borrar:
+
+```powershell
+az containerapp update `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --min-replicas 0 `
+  --max-replicas 1 `
+  --only-show-errors
+
+az postgres flexible-server stop `
+  --name slate-db-isa `
+  --resource-group universidad `
+  --only-show-errors
+```
+
+También se puede usar el botón **Stop/Start** del Portal cuando esté
+disponible. No se debe confundir escalar a cero con eliminar la aplicación.
+
+### Reiniciar
+
+En el Portal: **Container App → Revisions → seleccionar revision activa →
+Restart**.
+
+La operación CLI `az containerapp revision restart` fue probada y devolvió un
+error interno en este entorno Express. La alternativa validada es ejecutar
+`az containerapp update` con la misma imagen y `min-replicas 1`, y comprobar la
+revision Healthy y `/actuator/health`.
+
+### Health y logs
+
+```powershell
+Invoke-RestMethod `
+  -Uri "https://<fqdn>/actuator/health" `
+  -Method Get
+```
+
+En este entorno, `az containerapp logs show` falla con `eventStreamEndpoint`
+debido a una limitación de la extensión/entorno Express. Para consultar logs,
+usar el Portal:
+
+**Container App → Monitoring → Log stream** o **Monitoring → Logs**.
+
+Si Log Analytics está conectado, consultar la tabla de logs del entorno desde
+**Log Analytics workspace → Logs**. No crear un workspace adicional.
+
+### Actualizar imagen y rollback
+
+Ambas operaciones crean una nueva revision y deben usar tags SHA existentes:
+
+```powershell
+az containerapp update `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --image acringenieria.azurecr.io/slate-backend:<commit-sha> `
+  --min-replicas 1 `
+  --max-replicas 1 `
+  --only-show-errors
+```
+
+Para rollback, reemplazar `<commit-sha>` por un tag anterior validado. Antes hay
+que comprobar el digest en ACR, compatibilidad del esquema PostgreSQL y el costo
+de reactivar los recursos. No usar `latest`.
+
+### Eliminación
+
+La eliminación es destructiva y no forma parte de la rutina normal:
+
+```powershell
+az containerapp delete `
+  --name slate-back-isa `
+  --resource-group universidad `
+  --yes
+```
+
+No ejecutar este comando sin autorización explícita y sin confirmar la
+retención requerida de datos y configuración.
+
+### Resultado de la prueba de Fase 12
+
+- PostgreSQL se inició temporalmente y llegó a `Ready`.
+- Container App quedó `Running`.
+- Revision `slate-back-isa--latest`: `Healthy`, tráfico 100%.
+- `/actuator/health`: `UP`; componente `db`: `UP`.
+- La reactivación mediante `update` con la misma imagen fue exitosa.
+- `az containerapp revision restart` y `az containerapp logs show` presentaron
+  limitaciones del entorno Express; quedaron documentadas sus alternativas.
+- La app queda encendida temporalmente para que el usuario la apague desde el
+  Portal al finalizar la revisión. PostgreSQL no debe quedar encendido.

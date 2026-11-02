@@ -542,3 +542,28 @@ La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, ve
 - No se encendieron PostgreSQL ni Container Apps.
 
 La Fase 11 queda completada. Próximo paso: Fase 12, gestión operativa de Azure Container Apps.
+
+### FASE 12: Gestión operativa de Azure Container Apps (En progreso)
+
+- Recursos actuales: Container App `slate-back-isa` detenida/escalada a cero y PostgreSQL `slate-db-isa` detenido.
+- Alcance autorizado: probar temporalmente start, restart, health y logs; apagar todo al finalizar.
+- No se ejecutarán actualización de imagen, rollback ni eliminación.
+- No se modificará `goat-grup-one`, su entorno ni su repositorio ACR.
+
+#### Implementación y prueba
+
+- Estado/revisions consultados sin modificar `goat-grup-one`.
+- Precio revisado antes de iniciar: Container Apps Consumption cobra por uso; PostgreSQL conserva el costo mensual indicado por el Portal.
+- PostgreSQL inició temporalmente y llegó a `Ready`.
+- Container App quedó `Running`; revision `slate-back-isa--latest` `Healthy`, tráfico 100%.
+- `/actuator/health`: ✅ `UP`; base PostgreSQL: ✅ `UP`.
+- Reactivación mediante `az containerapp update` con la misma imagen: ✅.
+- `az containerapp start` no existe en la CLI instalada.
+- `az containerapp revision restart` devolvió error interno del entorno Express.
+- `az containerapp logs show` devolvió error `eventStreamEndpoint` del entorno/extensión Express.
+- Se documentaron alternativas en [`docs/azure.md`](docs/azure.md): Portal, actualización de revision, Log stream y Log Analytics.
+- No se ejecutaron actualización de imagen, rollback ni eliminación.
+
+La Fase 12 queda completada para el alcance autorizado. La Container App queda
+encendida temporalmente para que el usuario la apague desde el Portal; PostgreSQL
+debe permanecer detenido. Próximo paso: Fase 13, monitoreo y observabilidad.
