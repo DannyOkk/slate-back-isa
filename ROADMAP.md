@@ -607,3 +607,28 @@ Se corrigió el hallazgo de Jackson 3 reportado por el workflow sin tocar recurs
 - No se iniciaron PostgreSQL ni Container Apps y no se publicó una nueva imagen en ACR.
 
 El cambio de `pom.xml` queda listo para commit antes de iniciar la Fase 14.
+
+### FASE 14: CodeQL y seguridad adicional (Completada)
+
+- Se agregó [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) para
+  Java 21 en pull requests, pushes a `main` y ejecución manual.
+- El workflow usa `contents: read`, `actions: read` y `security-events: write`;
+  no publica imágenes ni despliega Azure.
+- La revisión no encontró SQL/JPQL dinámico: los repositorios usan métodos
+  derivados de Spring Data.
+- Los controladores aplican `@Valid` a los cuerpos y los DTOs principales
+  contienen validaciones de Bean Validation.
+- Se documentó la integración y el alcance en [`docs/ci-cd.md`](docs/ci-cd.md).
+- No se iniciarán PostgreSQL ni Container Apps ni se crearán recursos Azure.
+
+#### Validación
+
+- `.\mvnw.cmd --batch-mode test`: ✅ 52 tests, 0 fallos.
+- `git diff --check`: ✅ sin errores.
+- El workflow conserva la publicación manual ACR-only y no contiene pasos de
+  despliegue o activación de Azure.
+- `actionlint` no está instalado en el host; la estructura YAML fue revisada
+  manualmente.
+- No se modificaron proyectos originales ni se encendieron recursos Azure.
+
+La Fase 14 queda completada. Próximo paso: Fase 15, integración con React Native.

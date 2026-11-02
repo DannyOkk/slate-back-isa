@@ -93,6 +93,31 @@ La implementación fue validada sin ejecutar GitHub Actions ni modificar Azure:
 - `git diff --check`: sin errores.
 - `actionlint` no estaba instalado en el host; la estructura del workflow fue revisada mediante el diff.
 
+## Fase 14: CodeQL y revisión de seguridad
+
+El workflow [`codeql.yml`](../.github/workflows/codeql.yml) ejecuta análisis SAST
+para Java 21 en pull requests, pushes a `main` y mediante `workflow_dispatch`.
+Usa Maven en modo manual para que CodeQL observe la compilación real del
+proyecto y publica los resultados en GitHub Code Scanning con permisos mínimos:
+
+- `contents: read`
+- `actions: read`
+- `security-events: write`
+
+La revisión del código confirmó que:
+
+- Los repositorios usan métodos derivados de Spring Data; no hay SQL o JPQL
+  construido dinámicamente.
+- Los cuerpos de los endpoints usan `@Valid` y los DTOs principales tienen
+  restricciones de Bean Validation.
+- Las rutas protegidas requieren autenticación y el endpoint de métricas no es
+  público.
+- El workflow de CodeQL no publica imágenes, no accede a Azure y no inicia
+  PostgreSQL ni Container Apps.
+
+CodeQL cubre el código fuente Java. Maven y Grype continúan cubriendo
+dependencias y vulnerabilidades de la imagen.
+
 ## Fase 11: versionado y condiciones de despliegue
 
 ### Tres escenarios
