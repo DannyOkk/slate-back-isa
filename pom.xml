@@ -28,6 +28,11 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<!-- Fix CVEs: tomcat-embed-core 11.0.24 (GHSA-9xv2, GHSA-f525, GHSA-gcx9, GHSA-h3x4 - Critical) -->
+		<tomcat.version>11.0.25</tomcat.version>
+		<!-- Fix CVEs: jackson 2.x series (GHSA-q4xh, GHSA-p6pp, GHSA-7hhh, GHSA-cxp5, GHSA-wv8q - High) -->
+		<jackson-2-bom.version>2.21.7</jackson-2-bom.version>
+		<!-- jackson-bom.version controla jackson 3.x (tools.jackson); se deja en 3.1.5 hasta que 3.1.7 esté disponible -->
 	</properties>
 	<dependencies>
 		<dependency>
