@@ -66,6 +66,21 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    @DisplayName("Endpoint de métricas: /actuator/metrics debe requerir autenticación")
+    void metricsEndpoint_rejectedWithoutAuth() throws Exception {
+        mockMvc.perform(get("/actuator/metrics"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Endpoint de métricas: /actuator/metrics acepta un JWT válido")
+    void metricsEndpoint_acceptedWithValidToken() throws Exception {
+        mockMvc.perform(get("/actuator/metrics")
+                        .header("Authorization", "Bearer " + validToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("Endpoint público: /api/auth/login debe ser accesible sin cabecera Authorization")
     void publicEndpoint_login_accessibleWithoutAuth() throws Exception {
         mockMvc.perform(post("/api/auth/login")

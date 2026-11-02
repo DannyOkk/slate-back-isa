@@ -567,3 +567,29 @@ La Fase 11 queda completada. Próximo paso: Fase 12, gestión operativa de Azure
 La Fase 12 queda completada para el alcance autorizado. La Container App queda
 encendida temporalmente para que el usuario la apague desde el Portal; PostgreSQL
 debe permanecer detenido. Próximo paso: Fase 13, monitoreo y observabilidad.
+
+### FASE 13: Monitoreo y observabilidad (En progreso)
+
+- Baseline: Actuator ya exponía health/info/metrics y Hikari tenía pool `SlateHikariPool`.
+- Se mantendrán health/readiness/liveness públicos para probes.
+- `metrics` seguirá protegido con JWT.
+- No se crearán workspaces, Application Insights ni alertas nuevas.
+- Se reutilizarán los workspaces Log Analytics existentes y se controlará la ingestión.
+- Al finalizar se dejará `slate-back-isa` con `minReplicas=0` y `slate-db-isa` detenido.
+
+#### Implementación y validación
+
+- Se confirmó que no era necesaria una dependencia Prometheus adicional:
+  Actuator/Micrometer registra las métricas Hikari, JDBC, HTTP, JVM y proceso.
+- `info.env` quedó deshabilitado para no exponer variables de entorno.
+- Se agregó el tag global `application=slate-backend`.
+- Se agregaron pruebas de seguridad para `/actuator/metrics`: sin JWT rechaza
+  la petición y con JWT válido responde correctamente.
+- Se creó [`docs/monitoring.md`](docs/monitoring.md) con Actuator, Hikari,
+  Azure Monitor, Log Analytics, costos y factores 12-factor.
+- Tests Maven: ✅ 52 tests, 0 fallos.
+- Build Docker `linux/amd64`: ✅ validado; imagen temporal eliminada.
+- Container App: `minReplicas=0`.
+- PostgreSQL: `Stopped`.
+
+La Fase 13 queda completada. Próximo paso: Fase 14, CodeQL y seguridad adicional.

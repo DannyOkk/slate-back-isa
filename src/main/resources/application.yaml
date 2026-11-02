@@ -46,7 +46,10 @@ management:
         enabled: true
   info:
     env:
-      enabled: true
+      enabled: false
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 logging:
   level:
