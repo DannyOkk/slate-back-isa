@@ -632,3 +632,30 @@ El cambio de `pom.xml` queda listo para commit antes de iniciar la Fase 14.
 - No se modificaron proyectos originales ni se encendieron recursos Azure.
 
 La Fase 14 queda completada. Próximo paso: Fase 15, integración con React Native.
+
+### FASE 15: Integración React Native con Azure (En progreso)
+
+- El frontend `slate-front-isa` se conectará mediante `EXPO_PUBLIC_API_URL` a la
+  URL HTTPS de `slate-back-isa`.
+- Se verificará la compatibilidad de rutas, payloads, respuestas, JWT y
+  SecureStore con el backend.
+- La validación cloud será temporal y requerirá PostgreSQL y Container App
+  encendidos solo durante los smoke tests; ambos se apagarán al finalizar.
+- No se modificarán `goat-grup-one` ni recursos Azure ajenos a Slate.
+
+#### Implementación y validación
+
+- Se actualizó [`slate-front-isa/.env.example`](../slate-front-isa/.env.example)
+  para usar la URL HTTPS pública de Azure.
+- Se amplió el README del frontend con configuración PowerShell y diferencia
+  entre API remota y backend local.
+- Se agregó la declaración TypeScript para los imports CSS usados por Expo Web.
+- Lint del frontend: ✅ `npm run lint`.
+- TypeScript del frontend: ✅ `npx tsc --noEmit`.
+- API cloud: ✅ `/actuator/health` respondió `UP`.
+- Smoke end-to-end: ✅ registro, login JWT y `GET /api/clients` autenticado.
+- Los recursos fueron encendidos por el usuario para la prueba y quedan bajo su
+  control para apagarlos al finalizar; no se crearon recursos nuevos.
+
+La Fase 15 queda completada. Próximo paso: Fase 16, validación visual y
+preparación final de entrega del frontend.
