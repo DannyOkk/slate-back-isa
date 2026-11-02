@@ -659,3 +659,33 @@ La Fase 14 queda completada. Próximo paso: Fase 15, integración con React Nati
 
 La Fase 15 queda completada. Próximo paso: Fase 16, validación visual y
 preparación final de entrega del frontend.
+
+### FASE 16: Validación visual y entrega del frontend (En progreso)
+
+- Se prioriza Expo Web para la validación automatizada.
+- Se usará temporalmente Azure ya encendido, sin crear recursos ni cambiar
+  `goat-grup-one`.
+- Se dejará una checklist para la validación manual en Android con Expo Go.
+
+#### Implementación y validación
+
+- Expo Web inició correctamente en `http://localhost:8082`.
+- `npx expo export --platform web`: ✅ bundle generado y rutas estáticas de
+  inicio, login, registro, clientes, deudores, detalle y configuración.
+- `npm run lint`: ✅.
+- `npx tsc --noEmit`: ✅.
+- Smoke cloud completo: ✅ registro, login, cliente, detalle, fiado, consulta
+  deudores, pago y saldo final en cero.
+- Health Azure: ✅ `UP`.
+- Tokens inválidos: ✅ rechazados por la API con `403`.
+- La eliminación de clientes con movimientos queda rechazada por el backend
+  (`403`), por lo que se conserva como regla de integridad y no se fuerza desde
+  el frontend.
+- Se agregó al README del frontend la checklist para Expo Go Android y la
+  limitación de notificaciones/selector nativo en web.
+
+La Fase 16 queda completada para la validación automatizada web. Queda como
+validación manual del usuario el recorrido Android con Expo Go, especialmente
+notificaciones locales y selector nativo de fecha/hora. Azure permanece
+encendido porque fue activado por el usuario; puede apagarse al finalizar la
+prueba manual.
