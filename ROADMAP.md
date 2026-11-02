@@ -689,3 +689,32 @@ validación manual del usuario el recorrido Android con Expo Go, especialmente
 notificaciones locales y selector nativo de fecha/hora. Azure permanece
 encendido porque fue activado por el usuario; puede apagarse al finalizar la
 prueba manual.
+
+### FASE 17: Preparación EAS (En progreso)
+
+- Se preparará EAS sin generar APK/AAB ni publicar en tiendas.
+- Se definirá un identificador Android estable y perfiles reproducibles para
+  desarrollo, preview y producción.
+- Azure solo se consultará mediante health check; no se crearán ni modificarán
+  recursos.
+
+#### Implementación y validación
+
+- Se agregó `android.package` estable: `com.dannyokk.slate`.
+- Se agregó [`slate-front-isa/eas.json`](../slate-front-isa/eas.json) con
+  perfiles `development`, `preview` (APK interno) y `production`.
+- Se configuró `appVersionSource=remote` y `autoIncrement` solo para futuros
+  builds de producción.
+- `npx expo config --type public --json`: ✅ identidad Expo y paquete Android
+  válidos.
+- Validación JSON de `eas.json`: ✅ perfiles completos.
+- `npm run lint`: ✅.
+- `npx tsc --noEmit`: ✅.
+- Health Azure: ✅ `UP`; no se crearon ni modificaron recursos.
+- `eas-cli whoami`: cuenta no autenticada. La validación online de `eas config`
+  quedó pendiente hasta ejecutar `npx eas-cli@latest login`; no se inventó un
+  `projectId` ni se guardaron credenciales.
+
+La Fase 17 queda completada como preparación local. El vínculo de la cuenta
+Expo y cualquier build cloud quedan deliberadamente para una fase posterior,
+cuando el usuario autentique EAS.
