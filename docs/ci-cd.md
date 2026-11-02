@@ -92,3 +92,60 @@ La implementación fue validada sin ejecutar GitHub Actions ni modificar Azure:
 - Build Docker local `linux/amd64`: exitoso.
 - `git diff --check`: sin errores.
 - `actionlint` no estaba instalado en el host; la estructura del workflow fue revisada mediante el diff.
+
+## Fase 11: versionado y condiciones de despliegue
+
+### Tres escenarios
+
+| Escenario | Evento | Publica en ACR | Enciende Azure |
+|---|---|---:|---:|
+| CI sin publicación | Pull request o push a `main` | No | No |
+| Publicación controlada | `workflow_dispatch` con `publish=true` | Sí | No |
+| Revisión manual | Environment `azure-acr` con aprobación, si se configura | Sí, después de aprobar | No |
+
+El workflow no tiene un camino automático hacia Container Apps. Publicar una
+imagen en ACR no inicia la aplicación ni PostgreSQL.
+
+### Tags y digest
+
+Cada imagen usa el SHA completo del commit:
+
+```text
+acringenieria.azurecr.io/slate-backend:<40-character-commit-sha>
+```
+
+El SHA permite identificar el código fuente exacto. El digest SHA-256 devuelto
+por ACR identifica el contenido exacto de la imagen. Ambos valores deben
+conservarse al registrar una publicación. No se usa `latest` como referencia de
+despliegue porque es mutable y puede ocultar qué versión está activa.
+
+Para consultar un digest publicado:
+
+```powershell
+az acr repository show `
+  --name acringenieria `
+  --image slate-backend:<commit-sha> `
+  --query manifestDigest `
+  --output tsv
+```
+
+### Rollback
+
+El rollback consiste en seleccionar un tag SHA anterior que ya haya sido
+validado y actualizar manualmente la Container App para referenciarlo. Esa
+operación queda fuera del workflow de esta fase y requiere que PostgreSQL y la
+Container App se enciendan explícitamente, con autorización de costo.
+
+Antes de cualquier rollback hay que comprobar:
+
+1. El tag existe en ACR.
+2. El digest corresponde a la versión aprobada.
+3. La configuración de base de datos es compatible.
+4. Se acepta temporalmente el costo de encender los recursos.
+
+### Protección del environment
+
+Se recomienda crear el environment `azure-acr` en **Settings → Environments** y
+configurar revisores obligatorios. El job `publish` usa ese environment, por lo
+que una aprobación puede bloquear la publicación incluso cuando el input
+`publish=true` fue seleccionado.

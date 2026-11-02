@@ -525,3 +525,20 @@ La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, ve
 - La publicación requiere `workflow_dispatch`, el input `publish=true` y el environment `azure-acr`.
 - Las imágenes se identificarán con el SHA completo del commit; no se usará `latest` como referencia de despliegue.
 - No se encenderán PostgreSQL ni Container Apps durante esta fase.
+
+#### Implementación
+
+- Commit de cierre de Fase 10: `d3a49c3`.
+- Se confirmó que CI solo ejecuta validación y no publica.
+- Se confirmó que la publicación requiere `workflow_dispatch`, `publish=true` y el environment `azure-acr`.
+- Se documentaron tags SHA, digest ACR, rollback y aprobación manual en [`docs/ci-cd.md`](docs/ci-cd.md).
+- El rollback queda fuera del workflow y requiere autorización explícita para encender recursos.
+
+#### Validación
+
+- YAML revisado localmente; `actionlint` no está instalado.
+- Tests Maven: ✅ 50 tests, 0 fallos.
+- Build Docker `linux/amd64`: ✅ validado previamente y no se ejecutó publicación.
+- No se encendieron PostgreSQL ni Container Apps.
+
+La Fase 11 queda completada. Próximo paso: Fase 12, gestión operativa de Azure Container Apps.
