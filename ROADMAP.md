@@ -593,3 +593,17 @@ debe permanecer detenido. Próximo paso: Fase 13, monitoreo y observabilidad.
 - PostgreSQL: `Stopped`.
 
 La Fase 13 queda completada. Próximo paso: Fase 14, CodeQL y seguridad adicional.
+
+### Actualización de seguridad previa a la Fase 14: Jackson 3
+
+Se corrigió el hallazgo de Jackson 3 reportado por el workflow sin tocar recursos Azure:
+
+- `jackson-bom.version` quedó fijado en `3.1.7`.
+- Jackson 3 se resolvió transitivamente desde `spring-boot-starter-webmvc`.
+- Jackson 2 se mantuvo en `2.21.7` mediante `jackson-2-bom.version`.
+- La imagen `slate-backend:jackson-317` se reconstruyó para `linux/amd64`.
+- Grype con `--only-fixed --fail-on high` finalizó con código 0.
+- Los tests Maven continuaron pasando (52 tests, 0 fallos).
+- No se iniciaron PostgreSQL ni Container Apps y no se publicó una nueva imagen en ACR.
+
+El cambio de `pom.xml` queda listo para commit antes de iniciar la Fase 14.

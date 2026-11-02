@@ -56,7 +56,9 @@ test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8080/actuator/hea
 
 Esto reduce paquetes agregados a la imagen y mantiene el usuario no-root. La reconstrucción fue exitosa; Compose quedó saludable, `/actuator/health` respondió `UP` y el login JWT continuó funcionando. Esta reducción no cambió el conjunto de vulnerabilidades reportado por Grype: las coincidencias restantes provienen de la imagen base y de dependencias transitivas gestionadas por Spring Boot.
 
-No se forzaron versiones de Tomcat o Jackson manualmente. Aunque Grype indica versiones corregidas, sobrescribir componentes administrados por el BOM de Spring Boot sin una actualización compatible del framework puede romper el runtime. Queda como acción futura actualizar Spring Boot/BOM en una tarea separada, ejecutar toda la suite y volver a escanear.
+Se fijaron `tomcat.version` en `11.0.25` y `jackson-2-bom.version` en `2.21.7`, y se agregó `jackson-bom.version` en `3.1.7` para corregir las versiones administradas transitivamente por Spring Boot. Jackson 3 proviene de `spring-boot-starter-webmvc`; Jackson 2 continúa siendo utilizado por `jjwt-jackson`. La suite de tests y la reconstrucción de la imagen fueron ejecutadas después de los overrides.
+
+El rescaneo de `slate-backend:jackson-317` con Grype (`--only-fixed --fail-on high`) finalizó con código 0. Por lo tanto, no quedaron hallazgos High o Critical con versión corregida en el criterio que utiliza el workflow. Los hallazgos Medium/Low de Alpine y otros paquetes base siguen dependiendo de nuevas versiones de la imagen base o de sus repositorios.
 
 ## Riesgo y pendientes
 
