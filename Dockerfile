@@ -40,6 +40,10 @@ WORKDIR /app
 # Crear usuario y grupo sin privilegios para mitigar riesgos de seguridad (principio de menor privilegio)
 RUN addgroup -S spring && adduser -S spring -G spring
 
+RUN apk del --no-cache gnupg gnupg-dirmngr gnupg-gpgconf gnupg-keyboxd \
+    gnupg-utils gnupg-wks-client gpg gpg-agent \
+    gpg-wks-server gpgsm gpgv 2>/dev/null || true
+
 # Copiar el JAR empaquetado desde la etapa de construcción asignando propiedad al usuario spring
 COPY --from=builder --chown=spring:spring /build/target/slate-backend-0.0.1-SNAPSHOT.jar /app/app.jar
 
