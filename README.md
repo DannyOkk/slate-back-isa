@@ -159,6 +159,26 @@ docker compose up --build -d
 
 La guía completa de operación y verificación está en [`docs/docker.md`](docs/docker.md).
 
+## Operación Azure controlada
+
+El script [`script_az.py`](script_az.py) gestiona únicamente los recursos Slate:
+Resource Group `universidad`, ACR `acringenieria`, entorno `slate-isa` y
+Container App `slate-back-isa`. Rechaza nombres fuera de ese alcance para evitar
+modificar `goat-grup-one`.
+
+En PowerShell, con Azure CLI autenticada:
+
+```powershell
+python .\script_az.py
+```
+
+El script usa la sesión existente de `az login` cuando no hay credenciales de
+Service Principal locales. Para crear una Container App nueva se requiere un
+Service Principal completo; para actualizar la app Slate existente conserva las
+credenciales ACR ya configuradas. Los defaults son puerto `8080`, `minReplicas=0`
+y `maxReplicas=1` para limitar consumo. No se debe ejecutar la opción de deploy
+ni iniciar recursos sin revisar previamente el costo.
+
 ---
 
 ## Estructura del Proyecto

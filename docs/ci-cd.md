@@ -93,6 +93,14 @@ La implementación fue validada sin ejecutar GitHub Actions ni modificar Azure:
 - `git diff --check`: sin errores.
 - `actionlint` no estaba instalado en el host; la estructura del workflow fue revisada mediante el diff.
 
+La ejecución real del workflow CodeQL en GitHub fue verificada en el run
+[`41492423754`](https://github.com/DannyOkk/slate-back-isa/actions/runs/41492423754):
+el job `Analyze Java` terminó correctamente, incluyendo inicialización,
+compilación y análisis CodeQL. La API disponible no permite leer los nombres de
+secrets del repositorio; por eso la presencia de los secrets de publicación ACR
+queda pendiente de confirmación desde **Settings → Secrets and variables →
+Actions** o mediante una ejecución manual autorizada de `publish=true`.
+
 ## Fase 14: CodeQL y revisión de seguridad
 
 El workflow [`codeql.yml`](../.github/workflows/codeql.yml) ejecuta análisis SAST

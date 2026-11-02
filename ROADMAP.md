@@ -59,22 +59,22 @@ Suscripción estudiante (USD 100), Resource Group, ACR, Container Apps Environme
 ### ~~12. ETAPA 8: SERVICE PRINCIPAL Y SECRETOS~~ - `[x] COMPLETADO`
 Creación y configuración de Service Principal con permisos mínimos (RBAC en Resource Group), GitHub Secrets, secretos en Container Apps, .env.example.
 
-### 13. ETAPA 9: PUBLICACIÓN MANUAL EN AZURE - `[~] EN PROGRESO`
+### ~~13. ETAPA 9: PUBLICACIÓN MANUAL EN AZURE~~ - `[x] COMPLETADO`
 Build manual, push a ACR, deploy a Azure Container Apps, verificación de endpoints y login con JWT en la nube. Adaptación de script_az.py.
 
-### 14. ETAPA 10: GITHUB ACTIONS Y CI/CD - `[ ] PENDIENTE`
+### ~~14. ETAPA 10: GITHUB ACTIONS Y CI/CD~~ - `[x] COMPLETADO`
 Workflow automatizado: Checkout, Setup Java 21, build/test Maven, Docker build, escaneo Grype, login Azure, push ACR, deploy condicionado.
 
-### 15. ETAPA 11: VERSIONADO Y CONDICIONES DE DESPLIEGUE - `[ ] PENDIENTE`
+### ~~15. ETAPA 11: VERSIONADO Y CONDICIONES DE DESPLIEGUE~~ - `[x] COMPLETADO`
 Demostración de los 3 casos: (A) CI con imagen en ACR sin deploy, (B) CI + CD con deploy en Azure, (C) Ejecución manual vía workflow_dispatch. Tags con SHA corto.
 
-### 16. ETAPA 12: GESTIÓN DE AZURE CONTAINER APPS - `[ ] PENDIENTE`
+### ~~16. ETAPA 12: GESTIÓN DE AZURE CONTAINER APPS~~ - `[x] COMPLETADO`
 Operaciones CLI y Portal: deploy, start, stop, restart, list, delete, logs y rollback.
 
-### 17. ETAPA 13: MONITOREO Y OBSERVABILIDAD - `[ ] PENDIENTE`
+### ~~17. ETAPA 13: MONITOREO Y OBSERVABILIDAD~~ - `[x] COMPLETADO`
 Actuator, HikariCP metrics, Azure Monitor / Log Analytics, 12 factores (III, V, VII, XI).
 
-### 18. ETAPA 14: CODEQL Y SEGURIDAD ADICIONAL - `[ ] PENDIENTE`
+### ~~18. ETAPA 14: CODEQL Y SEGURIDAD ADICIONAL~~ - `[x] COMPLETADO`
 Análisis estático de código SAST con CodeQL, consultas parametrizadas, validación de inputs.
 
 ### 19. ETAPA 15: INTEGRACIÓN CON REACT NATIVE - `[ ] PENDIENTE`
@@ -139,12 +139,12 @@ Este documento se mantiene actualizado antes y después de cada fase como consta
 | **6** | Análisis de vulnerabilidades con Grype (CVE, CVSS) y remediación | **COMPLETADO** | 01/11/2026 |
 | **7** | Preparación de infraestructura en Microsoft Azure y control de costos | **COMPLETADO** | 01/11/2026 |
 | **8** | Service Principal de Azure y gestión de secretos | **COMPLETADO** | 01/11/2026 |
-| **9** | Publicación en ACR y despliegue manual en Azure Container Apps | **EN PROGRESO** | 01/11/2026 |
-| **10** | Automatización CI/CD con GitHub Actions | PENDIENTE | - |
-| **11** | Versionado de imágenes y condiciones de despliegue controlado | PENDIENTE | - |
-| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | PENDIENTE | - |
-| **13** | Monitoreo, métricas, logs y observabilidad (Actuator, Azure Monitor) | PENDIENTE | - |
-| **14** | Análisis estático de código con CodeQL y seguridad adicional | PENDIENTE | - |
+| **9** | Publicación en ACR y despliegue manual en Azure Container Apps | **COMPLETADO** | 01/11/2026 |
+| **10** | Automatización CI/CD con GitHub Actions | **COMPLETADO** | 02/11/2026 |
+| **11** | Versionado de imágenes y condiciones de despliegue controlado | **COMPLETADO** | 02/11/2026 |
+| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **COMPLETADO** | 02/11/2026 |
+| **13** | Monitoreo, métricas, logs y observabilidad (Actuator, Azure Monitor) | **COMPLETADO** | 02/11/2026 |
+| **14** | Análisis estático de código con CodeQL y seguridad adicional | **COMPLETADO** | 02/11/2026 |
 | **15** | Integración del frontend React Native con el backend en Azure | PENDIENTE | - |
 | **16** | Validación integral de requisitos y matriz de pruebas | PENDIENTE | - |
 | **17** | Documentación final y preparación para la defensa del examen parcial | PENDIENTE | - |
@@ -421,7 +421,7 @@ No se crearon recursos Azure ni se generaron costos nuevos durante esta fase.
 
 Antes de crear un Service Principal se debía confirmar qué identidad existente podía reutilizarse, definir permisos mínimos sobre el Resource Group, evitar credenciales permanentes innecesarias y preparar GitHub Secrets sin revelar valores. Esa revisión está documentada en la sección de Fase 8.
 
-### FASE 8: Service Principal y secretos (Completada; carga manual de GitHub pendiente)
+### FASE 8: Service Principal y secretos (Completada; secrets de GitHub no verificables desde la API disponible)
 
 #### Implementación
 
@@ -448,7 +448,7 @@ Antes de crear un Service Principal se debía confirmar qué identidad existente
 
 Antes del despliegue se deberá confirmar la credencial en GitHub, crear o autorizar una Container App propia para Slate, calcular el costo de PostgreSQL y obtener autorización explícita para las operaciones que puedan generar consumo.
 
-### FASE 9: Publicación manual en Azure (Bloqueada por política de suscripción)
+### FASE 9: Publicación manual en Azure (Completada; el bloqueo inicial quedó resuelto)
 
 El usuario autorizó publicar la imagen y desplegar recursos separados para Slate, con control estricto de costos. La ejecución quedó bloqueada por las políticas de Azure for Students antes de crear recursos: `eastus` informa restricción de aprovisionamiento y `westcentralus` rechaza el recurso por la política de regiones disponibles. No se modificó ningún recurso de `goat-grup-one`.
 

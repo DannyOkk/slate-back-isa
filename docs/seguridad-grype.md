@@ -62,8 +62,8 @@ El rescaneo de `slate-backend:jackson-317` con Grype (`--only-fixed --fail-on hi
 
 ## Riesgo y pendientes
 
-- **Tomcat Critical:** componente HTTP directamente relacionado con el servidor web; requiere prioridad máxima. La aplicación no debe publicarse en Azure con estos hallazgos sin evaluar una versión compatible del BOM.
-- **Jackson High/Medium:** riesgo asociado al procesamiento JSON; el impacto depende de los vectores concretos y del uso de deserialización.
+- **Tomcat:** los hallazgos iniciales Critical fueron corregidos al fijar `11.0.25`; deben volver a evaluarse si cambia Spring Boot o el BOM.
+- **Jackson:** los hallazgos High/Medium iniciales fueron corregidos al fijar Jackson 2.21.7 y Jackson 3.1.7; el impacto original dependía de los vectores concretos y del uso de deserialización.
 - **Alpine Medium/Low:** paquetes del runtime; minimizar la imagen reduce superficie, pero la corrección depende de una nueva imagen base publicada.
 - El escaneo no demostró que la imagen esté libre de vulnerabilidades; demostró el estado concreto de la imagen en esta fecha y con esta base de datos.
 
