@@ -47,19 +47,19 @@ Estructura obligatoria por etapa con explicación, cambios, comandos PowerShell,
 ### ~~**8. ETAPA 4: CREACIÓN DEL DOCKERFILE**~~ - `[x] COMPLETADO`
 Construcción multietapa Java 21, imagen distroless/slim no-root, etiquetas OCI, arquitectura linux/amd64, .dockerignore.
 
-### 9. ETAPA 5: DOCKER COMPOSE - `[ ] PENDIENTE`
+### ~~9. ETAPA 5: DOCKER COMPOSE~~ - `[x] COMPLETADO`
 docker-compose.yml con backend y PostgreSQL 16/17, volúmenes con persistencia, health checks con `pg_isready` y `/actuator/health`.
 
-### 10. ETAPA 6: GRYPE, CVE Y CVSS - `[ ] PENDIENTE`
+### ~~10. ETAPA 6: GRYPE, CVE Y CVSS~~ - `[x] COMPLETADO`
 Escaneo de vulnerabilidades de la imagen con Grype, informe CVE/CVSS inicial, remediación, escaneo final comparativo.
 
-### 11. ETAPA 7: PREPARACIÓN DE MICROSOFT AZURE - `[ ] PENDIENTE`
+### ~~11. ETAPA 7: PREPARACIÓN DE MICROSOFT AZURE~~ - `[x] COMPLETADO`
 Suscripción estudiante (USD 100), Resource Group, ACR, Container Apps Environment, PostgreSQL Flexible Server, control de costos.
 
-### 12. ETAPA 8: SERVICE PRINCIPAL Y SECRETOS - `[ ] PENDIENTE`
+### ~~12. ETAPA 8: SERVICE PRINCIPAL Y SECRETOS~~ - `[x] COMPLETADO`
 Creación y configuración de Service Principal con permisos mínimos (RBAC en Resource Group), GitHub Secrets, secretos en Container Apps, .env.example.
 
-### 13. ETAPA 9: PUBLICACIÓN MANUAL EN AZURE - `[ ] PENDIENTE`
+### 13. ETAPA 9: PUBLICACIÓN MANUAL EN AZURE - `[~] EN PROGRESO`
 Build manual, push a ACR, deploy a Azure Container Apps, verificación de endpoints y login con JWT en la nube. Adaptación de script_az.py.
 
 ### 14. ETAPA 10: GITHUB ACTIONS Y CI/CD - `[ ] PENDIENTE`
@@ -135,11 +135,11 @@ Este documento se mantiene actualizado antes y después de cada fase como consta
 | **2** | **Seguridad en Spring Boot, JWT y validación** | **COMPLETADO** | 31/10/2026 |
 | **3** | **Base de datos PostgreSQL y pool de conexiones HikariCP** | **COMPLETADO** | 31/10/2026 |
 | **4** | **Dockerfile multietapa y construcción de imagen optimizada** | **COMPLETADO** | 31/10/2026 |
-| **5** | Docker Compose para entorno local (Backend + PostgreSQL) | **PRÓXIMO PASO** | - |
-| **6** | Análisis de vulnerabilidades con Grype (CVE, CVSS) y remediación | PENDIENTE | - |
-| **7** | Preparación de infraestructura en Microsoft Azure y control de costos | PENDIENTE | - |
-| **8** | Service Principal de Azure y gestión de secretos | PENDIENTE | - |
-| **9** | Publicación en ACR y despliegue manual en Azure Container Apps | PENDIENTE | - |
+| **5** | Docker Compose para entorno local (Backend + PostgreSQL) | **COMPLETADO** | 01/11/2026 |
+| **6** | Análisis de vulnerabilidades con Grype (CVE, CVSS) y remediación | **COMPLETADO** | 01/11/2026 |
+| **7** | Preparación de infraestructura en Microsoft Azure y control de costos | **COMPLETADO** | 01/11/2026 |
+| **8** | Service Principal de Azure y gestión de secretos | **COMPLETADO** | 01/11/2026 |
+| **9** | Publicación en ACR y despliegue manual en Azure Container Apps | **EN PROGRESO** | 01/11/2026 |
 | **10** | Automatización CI/CD con GitHub Actions | PENDIENTE | - |
 | **11** | Versionado de imágenes y condiciones de despliegue controlado | PENDIENTE | - |
 | **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | PENDIENTE | - |
@@ -330,17 +330,198 @@ Se auditaron los repositorios locales:
 
 ---
 
-### PRÓXIMO PASO: FASE 5 – Docker Compose
+### FASE 5: Docker Compose (Completada)
 
-**Objetivo:** Crear un `docker-compose.yml` que levante el backend y PostgreSQL en contenedores coordinados, con persistencia en volúmenes nombrados, health checks y variables desde `.env`.
+**Objetivo:** Crear un `docker-compose.yml` que levante el backend y PostgreSQL en contenedores coordinados, con persistencia en volúmenes nombrados, health checks y variables desde `.env`. La validación usará PostgreSQL 16 Alpine y no requiere iniciar el PostgreSQL instalado en Windows.
 
-**Tareas a ejecutar en la Fase 5:**
-1. Crear [`docker-compose.yml`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docker-compose.yml) con:
-   - Servicio `db`: `postgres:16-alpine`, volumen nombrado `postgres_data`, healthcheck con `pg_isready`.
-   - Servicio `backend`: `build: .`, `depends_on: db: condition: service_healthy`, env vars desde `.env` (con `DB_URL` apuntando al servicio `db`), puerto `8080:8080`, healthcheck contra `/actuator/health`.
-2. Ajustar `.env.example` para cubrir todas las variables necesarias para Compose.
-3. Verificar el stack completo con `docker compose up --build`.
-4. Probar endpoints end-to-end (register → login → clients) contra el stack de contenedores.
-5. Documentar el stack en `docs/docker.md`.
+#### Implementación
+1. Se creó [`docker-compose.yml`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docker-compose.yml) con:
+   - Servicio `db` basado en `postgres:16-alpine`.
+   - Volumen nombrado `slate-postgres-data` y red `slate-network`.
+   - Health check de PostgreSQL con `pg_isready`.
+   - Servicio `backend` construido desde el Dockerfile, con `depends_on` condicionado a `service_healthy`.
+   - `DB_URL` interno apuntando a `jdbc:postgresql://db:5432/...`, nunca a `localhost`.
+   - Health check HTTP contra `/actuator/health`.
+   - Variables obligatorias interpoladas desde `.env`, sin contraseñas reales en archivos versionados.
+2. Se agregó `curl` a la imagen runtime para ejecutar el health check HTTP sin cambiar el usuario no-root.
+3. Se actualizaron [`.env.example`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/.env.example), [`README.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/README.md) y [`docs/docker.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/docker.md) con el flujo de PowerShell 5.1, persistencia y limpieza.
 
+#### Resultados de Verificación
 
+| Verificación | Resultado |
+|:---|:---|
+| `docker compose config` | ✅ Configuración válida e interpolación correcta |
+| `docker compose up --build -d` | ✅ Imagen construida y servicios iniciados |
+| Estado de servicios | ✅ `db` saludable y `backend` saludable |
+| `GET /actuator/health` | ✅ `status: UP`, incluyendo conexión PostgreSQL |
+| Flujo end-to-end | ✅ Registro, login JWT y `GET /api/clients` funcionando |
+| Persistencia | ✅ Login del usuario conservado después de `docker compose down` + `up -d` |
+| `.\mvnw.cmd test` | ✅ 50 tests, 0 fallos, 0 errores |
+| Secretos en imagen | ✅ La imagen no contiene `DB_PASSWORD` ni `JWT_SECRET` |
+| Azure | ✅ No se crearon recursos ni se generaron costos |
+
+La operación detallada, incluyendo la diferencia entre `docker compose down` y `docker compose down -v`, está documentada en [`docs/docker.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/docker.md).
+
+### FASE 6: Grype, CVE y CVSS (Completada)
+
+#### Implementación
+1. Se verificó que Grype no estaba instalado localmente y se ejecutó `anchore/grype:latest` dentro de Docker, sin instalar software adicional en Windows.
+2. Se escaneó `slate-backend:local` como Docker archive. Grype reportó 44 coincidencias de paquetes y 15 identificadores únicos.
+3. Se reemplazó el `curl` agregado al runtime por el `wget` incluido en Alpine BusyBox para conservar el health check sin sumar paquetes runtime. El cambio no altera la aplicación ni el contrato de endpoints.
+4. No se sobrescribieron Tomcat/Jackson manualmente: Grype indica versiones corregidas, pero esas dependencias son transitivas del BOM de Spring Boot y requieren una actualización compatible del framework, no un override especulativo.
+
+#### Resultados inicial/final
+
+| Severidad | Inicial | Final | Variación |
+|:---|---:|---:|---:|
+| Critical | 4 | 4 | 0 |
+| High | 10 | 10 | 0 |
+| Medium | 19 | 19 | 0 |
+| Low | 11 | 11 | 0 |
+| **Total de coincidencias** | **44** | **44** | **0** |
+
+Los cuatro hallazgos Critical corresponden a `tomcat-embed-core` 11.0.24, con corrección indicada en 11.0.25. Los High/Medium principales corresponden a Jackson. Los hallazgos de Alpine afectan `coreutils`, BusyBox y GnuPG. El detalle de CVE, CVSS, paquetes, riesgo, remediación, pendientes y comparación con Trivy está en [`docs/seguridad-grype.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/seguridad-grype.md).
+
+#### Verificación posterior
+
+| Verificación | Resultado |
+|:---|:---|
+| Reconstrucción `docker compose up --build -d` | ✅ Exitosa |
+| `db` y `backend` | ✅ Saludables |
+| `/actuator/health` | ✅ `UP` |
+| Login de prueba local | ✅ Funcionando |
+| Tests Maven previos | ✅ 50 tests, 0 fallos |
+| Azure/costos | ✅ No se crearon recursos |
+
+### Contexto previo de la FASE 7
+
+Antes de crear cualquier recurso se debía revisar la suscripción de estudiante, crédito disponible, recursos reutilizables, regiones y costo estimado. Esa auditoría está documentada en la sección siguiente.
+
+### FASE 7: Preparación de Microsoft Azure (Completada)
+
+#### Auditoría de solo lectura
+
+- Suscripción activa: **Azure for Students**, habilitada.
+- Resource Group existente: `universidad`, región `eastus`.
+- ACR reutilizable: `acringenieria`, tier Standard, con repositorio existente de `goat-grup-one`. Ese repositorio y la aplicación original no se modificaron.
+- Container Apps: existe `goat-grup-one-env` en Consumption y la app `goat-grup-one`. No se modificaron; Slate requerirá una app y tags propios.
+- Log Analytics: se detectaron cuatro workspaces Standard/PerGB2018 con 30 días de retención; no se creó otro.
+- PostgreSQL Flexible Server: no existe en el Resource Group. `Microsoft.DBforPostgreSQL` está `NotRegistered` y la consulta de disponibilidad no devolvió `Standard_B1ms` en `eastus`. No se registró el proveedor ni se creó la base.
+- RBAC: el usuario tiene permisos Owner a nivel de suscripción y User Access Administrator; hay un Contributor Service Principal en el Resource Group. No se crearon identidades ni roles.
+- Budget: no se encontró un presupuesto visible en el Resource Group; debe verificarse en el portal y configurarse solo con autorización.
+- Management Groups: la lectura fue rechazada por autorización; no es necesaria para esta fase.
+
+#### Costos y decisión
+
+La recomendación es reutilizar el Resource Group, ACR y, si se autoriza expresamente, el entorno Consumption existente con una Container App separada. PostgreSQL administrado sigue pendiente hasta confirmar SKU/región y costo en Azure Pricing Calculator. El detalle de arquitectura, comandos PowerShell, costos de referencia y controles de crédito está en [`docs/azure.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/azure.md).
+
+No se crearon recursos Azure ni se generaron costos nuevos durante esta fase.
+
+### Contexto previo de la FASE 8
+
+Antes de crear un Service Principal se debía confirmar qué identidad existente podía reutilizarse, definir permisos mínimos sobre el Resource Group, evitar credenciales permanentes innecesarias y preparar GitHub Secrets sin revelar valores. Esa revisión está documentada en la sección de Fase 8.
+
+### FASE 8: Service Principal y secretos (Completada; carga manual de GitHub pendiente)
+
+#### Implementación
+
+- Se creó el Service Principal exclusivo `slate-back-isa-ci`; no se modificó el Service Principal existente.
+- Se asignó `Reader` al Resource Group `universidad`.
+- Se asignó `AcrPush` únicamente al registry `acringenieria`.
+- No se asignó `Owner`, `User Access Administrator`, `Contributor` de suscripción ni `Container Apps Contributor`.
+- Se generó una credencial temporal fuera del repositorio para carga manual en GitHub. El secreto no fue incluido en archivos versionados ni en la respuesta.
+- Se agregaron [`docs/ci-cd.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/ci-cd.md), la sección de Fase 8 en [`docs/azure.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/azure.md) y placeholders seguros en [`.env.example`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/.env.example).
+
+#### Verificación
+
+| Verificación | Resultado |
+|:---|:---|
+| Identidad nueva habilitada | ✅ Service Principal creado |
+| `Reader` en Resource Group | ✅ Verificado |
+| `AcrPush` en ACR | ✅ Verificado |
+| Archivo temporal fuera del repositorio | ✅ Credencial fuera del repo; eliminar después de cargarla en GitHub |
+| Secretos versionados | ✅ No hay archivos de credenciales rastreados |
+| Container Apps original | ✅ No modificada |
+| Costos directos de identidad/RBAC | ✅ Sin cargo directo |
+
+### PRÓXIMO PASO: FASE 9 – Publicación manual en ACR y Azure Container Apps
+
+Antes del despliegue se deberá confirmar la credencial en GitHub, crear o autorizar una Container App propia para Slate, calcular el costo de PostgreSQL y obtener autorización explícita para las operaciones que puedan generar consumo.
+
+### FASE 9: Publicación manual en Azure (Bloqueada por política de suscripción)
+
+El usuario autorizó publicar la imagen y desplegar recursos separados para Slate, con control estricto de costos. La ejecución quedó bloqueada por las políticas de Azure for Students antes de crear recursos: `eastus` informa restricción de aprovisionamiento y `westcentralus` rechaza el recurso por la política de regiones disponibles. No se modificó ningún recurso de `goat-grup-one`.
+
+#### Preparación local verificada
+
+- `.\mvnw.cmd test`: ✅ 50 tests, 0 fallos.
+- Imagen `linux/amd64`: ✅ construida.
+- Tag inmutable: `slate-backend:e50018636cdc`.
+- Usuario no-root: ✅ `spring:spring`.
+- Secretos: ✅ no rastreados ni embebidos.
+- Push al ACR: no ejecutado porque PostgreSQL no pudo aprovisionarse.
+- Imagen publicada posteriormente tras la creación manual de PostgreSQL: ✅ `acringenieria.azurecr.io/slate-backend:e50018636cdc`, digest `sha256:a711502e85aeb6b3c474413bf1941e9fc35c0eb30f4fdddef7618b9e03c3d955`.
+
+#### Operaciones Azure bloqueadas
+
+Se verificó disponibilidad de SKU y precio antes de crear: `eastus` ofrecía `Standard_B1ms` pero rechazó el aprovisionamiento; `westcentralus` ofrecía el SKU pero una policy de la suscripción rechazó el recurso. No se creó PostgreSQL, no se hizo push al ACR, no se creó Container App ni se asignó `Container Apps Contributor`. La estimación y el bloqueo están documentados en [`docs/azure.md`](file:///C:/Users/alexp/Documents/GitHub/slate-back-isa/docs/azure.md).
+
+#### Resultado de la ejecución controlada
+
+- Registro `Microsoft.DBforPostgreSQL`: ✅ realizado; sin cargo directo.
+- `eastus` + `Standard_B1ms`: ❌ rechazado por restricción de aprovisionamiento.
+- `westcentralus` + `Standard_B1ms`: ❌ rechazado por policy `RequestDisallowedByAzure`.
+- PostgreSQL `slate-db-isa`: ✅ confirmado inexistente.
+- Imagen `slate-backend:e50018636cdc` en ACR: ✅ confirmado inexistente.
+- Container App `slate-back-isa`: ✅ confirmado inexistente.
+
+### Actualización posterior: Container App desplegada
+
+La Container App `slate-back-isa` quedó desplegada en el entorno `slate-isa` con la imagen publicada en ACR. La URL pública responde correctamente:
+
+- `/actuator/health`: `UP`
+- Base de datos PostgreSQL: `UP`
+- Readiness/liveness: `UP`
+- URL: `https://slate-back-isa.calmriver-a6a4e760.canadacentral.azurecontainerapps.io`
+
+La raíz `/` devuelve `403`, comportamiento esperado porque no existe una ruta pública para `/`. El login con el usuario de prueba local devolvió `401`; no se modificaron datos de autenticación automáticamente.
+
+La validación cloud completó el flujo:
+
+- Registro de `danny@gmail.com`: ✅
+- Login/JWT: ✅
+- `/api/auth/validate`: ✅ perfil `Danny`
+- `DDL_AUTO`: cambiado a `validate`
+- Container App: `minReplicas=0`
+- PostgreSQL `slate-db-isa`: `Stopped`
+- Recursos originales `goat-grup-one`: ✅ no modificados.
+
+La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container App y PostgreSQL validados, y ambos cómputos detenidos. El siguiente paso es automatizar CI/CD sin iniciar recursos Azure automáticamente.
+
+### FASE 10: GitHub Actions y CI/CD (En progreso)
+
+- CI automático: tests Maven, build Docker `linux/amd64` y escaneo Grype en pull requests y pushes a `main`.
+- CD manual: publicación del tag SHA en `acringenieria.azurecr.io/slate-backend` mediante `workflow_dispatch`.
+- No se automatizará el despliegue ni el inicio de `slate-back-isa` o `slate-db-isa`; ambos permanecen detenidos.
+- No se modificará `goat-grup-one` ni su repositorio ACR.
+
+#### Implementación y validación
+
+- Workflow creado en [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
+- CI: Java 21, Maven tests, Docker `linux/amd64` y Grype con corte `high`.
+- CD: `workflow_dispatch` con input explícito `publish`; publica únicamente en `slate-backend` del ACR.
+- No ejecuta Container Apps ni PostgreSQL y no requiere `Container Apps Contributor`.
+- `.\mvnw.cmd --batch-mode test`: ✅ 50 tests, 0 fallos.
+- Build Docker local `linux/amd64`: ✅ validado con tag temporal `slate-backend:ci-phase10`.
+- YAML y whitespace: ✅ revisión local; `actionlint` no está instalado.
+- Imagen temporal local eliminada después de validar para no conservar espacio innecesario.
+
+La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, versionado y condiciones de despliegue.
+
+### FASE 11: Versionado y condiciones de despliegue (En progreso)
+
+- Se cerrará la Fase 10 en un commit antes de modificar el workflow.
+- CI no publica automáticamente.
+- La publicación requiere `workflow_dispatch`, el input `publish=true` y el environment `azure-acr`.
+- Las imágenes se identificarán con el SHA completo del commit; no se usará `latest` como referencia de despliegue.
+- No se encenderán PostgreSQL ni Container Apps durante esta fase.

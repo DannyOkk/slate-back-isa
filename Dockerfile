@@ -56,4 +56,3 @@ EXPOSE 8080
 
 # Comando de inicio
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-

@@ -45,6 +45,7 @@ Asegurate de tener instalado en tu entorno de desarrollo:
 
 - **Java 21 JDK** — [Descargar OpenJDK 21](https://openjdk.org/projects/jdk/21/)
 - **PostgreSQL 15+** — instancia corriendo localmente
+- **Docker Desktop** con el motor WSL 2 habilitado (para Docker Compose)
 - **Maven 3.8+** — o usar el Maven Wrapper incluido (`./mvnw`)
 
 > No es necesario instalar Maven globalmente. El proyecto incluye `mvnw` / `mvnw.cmd`.
@@ -132,6 +133,31 @@ mvnw.cmd spring-boot:run
 ```
 
 La API queda disponible en: **`http://localhost:8080`**
+
+## Ejecución con Docker Compose
+
+Docker Compose levanta el backend y PostgreSQL 16 en contenedores separados. No es necesario iniciar el PostgreSQL instalado en Windows.
+
+En PowerShell, copiá `.env.example` a `.env` y completá `DB_PASSWORD` y `JWT_SECRET`. Luego ejecutá:
+
+```powershell
+Copy-Item .env.example .env
+docker compose config
+docker compose up --build -d
+docker compose ps
+Invoke-RestMethod http://localhost:8080/actuator/health
+```
+
+Para consultar logs o reconstruir:
+
+```powershell
+docker compose logs -f backend
+docker compose up --build -d
+```
+
+`docker compose down` elimina los contenedores y conserva el volumen de PostgreSQL. `docker compose down -v` también elimina el volumen y borra los datos locales.
+
+La guía completa de operación y verificación está en [`docs/docker.md`](docs/docker.md).
 
 ---
 
