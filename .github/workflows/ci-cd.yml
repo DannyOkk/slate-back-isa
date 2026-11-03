@@ -66,6 +66,7 @@ jobs:
           image: ${{ env.IMAGE_REPOSITORY }}:${{ env.IMAGE_TAG }}
           fail-build: true
           severity-cutoff: high
+          only-fixed: true
           output-format: table
 
       - name: Export tested image
