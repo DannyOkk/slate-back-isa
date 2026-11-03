@@ -88,7 +88,7 @@ Se creó [`docs/guia-parcial.md`](docs/guia-parcial.md) con 50 preguntas,
 respuestas breves y una demostración sugerida. El simulacro oral queda como
 actividad del estudiante.
 
-### 22. ETAPA 18: CIERRE FINAL Y PREPARACIÓN DE PRODUCCIÓN - `[~] EN PROGRESO`
+### ~~22. ETAPA 18: CIERRE FINAL Y PREPARACIÓN DE PRODUCCIÓN~~ - `[x] COMPLETADO`
 Vinculación EAS, auditoría de pendientes históricos, documentación final y
 preparación de producción sin publicar en tiendas.
 
@@ -146,9 +146,9 @@ Este documento se mantiene actualizado antes y después de cada fase como consta
 | **7** | Preparación de infraestructura en Microsoft Azure y control de costos | **COMPLETADO** | 01/11/2026 |
 | **8** | Service Principal de Azure y gestión de secretos | **COMPLETADO** | 01/11/2026 |
 | **9** | Publicación en ACR y despliegue manual en Azure Container Apps | **COMPLETADO** | 01/11/2026 |
-| **10** | Automatización CI/CD con GitHub Actions | **EN PROGRESO** | — |
-| **11** | Versionado de imágenes y condiciones de despliegue controlado | **EN PROGRESO** | — |
-| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **EN PROGRESO** | — |
+| **10** | Automatización CI/CD con GitHub Actions | **COMPLETADO** | 03/11/2026 |
+| **11** | Versionado de imágenes y condiciones de despliegue controlado | **COMPLETADO** | 03/11/2026 |
+| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **COMPLETADO** | 03/11/2026 |
 | **13** | Monitoreo, métricas, logs y observabilidad (Actuator, Azure Monitor) | **COMPLETADO** | 02/11/2026 |
 | **14** | Análisis estático de código con CodeQL y seguridad adicional | **COMPLETADO** | 02/11/2026 |
 | **15** | Integración del frontend React Native con el backend en Azure | **COMPLETADO** | 02/11/2026 |
