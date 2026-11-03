@@ -724,16 +724,30 @@ prueba manual.
 El paquete Android se ajustó posteriormente a `com.slate.app`, solicitado para
 los futuros builds.
 
-La Fase 17 queda completada como preparación local. El vínculo de la cuenta
-Expo y cualquier build cloud quedan deliberadamente para una fase posterior,
-cuando el usuario autentique EAS.
+La Fase 17 quedó completada como preparación local. El vínculo de la cuenta
+Expo se concretó durante la Fase 18; cualquier build cloud queda como operación
+posterior opcional.
 
-### FASE 18: Cierre final y preparación de producción (En progreso)
+### FASE 18: Cierre final y preparación de producción (Completada)
 
 - Se auditan pendientes históricos y se sincronizan los estados de la sección
   maestra con las fases detalladas.
 - Se incorpora la guía de defensa de 50 preguntas.
-- Se vinculará EAS y se validará el `projectId` cuando la cuenta Expo esté
-  autenticada.
+- EAS quedó vinculado bajo la cuenta `dannyokk` con el `projectId`
+  `1cbd6c69-df05-472c-ae3f-e851afedc5cc`.
 - Se dejará producción preparada sin generar APK/AAB ni publicar en tiendas.
 - Azure se consultará solo con health check y no se crearán recursos.
+
+#### Vinculación EAS verificada
+
+- `npx eas-cli@latest whoami`: ✅ `dannyokk`.
+- `npx eas-cli@latest init`: ✅ proyecto `@dannyokk/slate-mobile` creado y
+  vinculado.
+- `npx eas-cli@latest config --platform android --profile production --json`:
+  ✅ configuración resuelta con `com.slate.app`, `autoIncrement` y credenciales
+  remotas.
+- No se generó APK/AAB, no se publicó en tiendas y no se modificó Azure.
+
+La Fase 18 queda completada y es la última fase de implementación. Los builds,
+la firma y la publicación quedan como operaciones posteriores opcionales, con
+costos y autorización propios.
