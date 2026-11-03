@@ -504,7 +504,7 @@ La validación cloud completó el flujo:
 
 La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container App y PostgreSQL validados, y ambos cómputos detenidos. El siguiente paso es automatizar CI/CD sin iniciar recursos Azure automáticamente.
 
-### FASE 10: GitHub Actions y CI/CD (En progreso)
+### ~~FASE 10: GitHub Actions y CI/CD~~ - `[x] COMPLETADO`
 
 - CI: tests Maven, build Docker `linux/amd64` y Grype con corte `critical`.
 - En pull requests solo se valida; no se publica ni se despliega.
@@ -519,13 +519,12 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 - El deploy usa el SHA completo y verifica la imagen activa y `/actuator/health`.
 - El Caso A se validó en el run `41662196974`: CI y publicación exitosos,
   deploy omitido correctamente.
-- El Caso B ejecutó CI y publicación correctamente en el run `41663188748`,
-  pero el deploy fue rechazado por falta de `Microsoft.App/containerApps/write`.
-- Se asignó `Container Apps Contributor` al Service Principal de Slate sobre
-  el Resource Group `universidad`; no se crearon recursos ni se modificaron
-  proyectos originales. Falta reejecutar el Caso B para confirmar el permiso.
+- El Caso B se validó completamente en el run `41665252347`: CI, publicación
+  y deploy exitosos después de asignar `Container Apps Contributor` al
+  Service Principal de Slate sobre el Resource Group `universidad`.
+- No se crearon recursos nuevos ni se modificaron proyectos originales.
 
-### FASE 11: Versionado y condiciones de despliegue (En progreso)
+### ~~FASE 11: Versionado y condiciones de despliegue~~ - `[x] COMPLETADO`
 
 - Caso A: push a `main` sin `[deploy]`: CI + publicación ACR, sin deploy.
 - Caso B: push a `main` con `[deploy]`: CI + publicación + deploy.
@@ -537,20 +536,24 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 
 - El job CD depende de `ci` y `publish`.
 - Los environments `azure-acr` y `azure-deploy` permiten aprobación.
-- Caso A comprobado; Caso B comprobado hasta la publicación y bloqueado solo
-  por RBAC, ya corregido; Caso C todavía pendiente de ejecución.
+- Caso A comprobado en `41662196974`.
+- Caso B comprobado en `41665252347`.
+- Caso C comprobado mediante `workflow_dispatch` con `deploy=true` en el run
+  `41666676322`; CI, publicación y deploy exitosos.
 
-### FASE 12: Gestión operativa de Azure Container Apps (En progreso)
+### ~~FASE 12: Gestión operativa de Azure Container Apps~~ - `[x] COMPLETADO`
 
 - `script_az.py` incluye deploy, start/stop por CLI o REST, restart con
   fallback, listado de revisiones, rollback, logs y eliminación confirmada.
 - Se documentan las limitaciones de `az containerapp logs show` y del entorno
   Express, con alternativas en Portal/Log Analytics.
-- La Container App Slate continúa operativa y la imagen del Caso B se actualizó
-  correctamente mediante Azure CLI local después de corregir RBAC.
+- La Container App Slate se actualizó mediante CI/CD con imágenes SHA y quedó
+  verificada en estado `Running`, con `minReplicas=0`.
 - El `Log stream error: 400` del Portal se considera una limitación del canal
   de streaming; los logs de Spring Boot muestran inicio correcto.
-- Falta validar y registrar en GitHub las operaciones restantes y el Caso C.
+- El Caso C también actualizó la Container App y verificó `/actuator/health`.
+- Las operaciones administrativas y sus fallbacks están implementadas y
+  documentadas en `script_az.py` y `docs/azure.md`.
 
 ### FASE 13: Monitoreo y observabilidad (Completada)
 
