@@ -700,7 +700,7 @@ prueba manual.
 
 #### Implementación y validación
 
-- Se agregó `android.package` estable: `com.dannyokk.slate`.
+- Se agregó `android.package` estable: `com.slate.app`.
 - Se agregó [`slate-front-isa/eas.json`](../slate-front-isa/eas.json) con
   perfiles `development`, `preview` (APK interno) y `production`.
 - Se configuró `appVersionSource=remote` y `autoIncrement` solo para futuros
@@ -714,6 +714,9 @@ prueba manual.
 - `eas-cli whoami`: cuenta no autenticada. La validación online de `eas config`
   quedó pendiente hasta ejecutar `npx eas-cli@latest login`; no se inventó un
   `projectId` ni se guardaron credenciales.
+
+El paquete Android se ajustó posteriormente a `com.slate.app`, solicitado para
+los futuros builds.
 
 La Fase 17 queda completada como preparación local. El vínculo de la cuenta
 Expo y cualquier build cloud quedan deliberadamente para una fase posterior,
