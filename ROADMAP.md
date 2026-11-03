@@ -146,9 +146,9 @@ Este documento se mantiene actualizado antes y después de cada fase como consta
 | **7** | Preparación de infraestructura en Microsoft Azure y control de costos | **COMPLETADO** | 01/11/2026 |
 | **8** | Service Principal de Azure y gestión de secretos | **COMPLETADO** | 01/11/2026 |
 | **9** | Publicación en ACR y despliegue manual en Azure Container Apps | **COMPLETADO** | 01/11/2026 |
-| **10** | Automatización CI/CD con GitHub Actions | **COMPLETADO** | 02/11/2026 |
-| **11** | Versionado de imágenes y condiciones de despliegue controlado | **COMPLETADO** | 02/11/2026 |
-| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **COMPLETADO** | 02/11/2026 |
+| **10** | Automatización CI/CD con GitHub Actions | **EN PROGRESO** | — |
+| **11** | Versionado de imágenes y condiciones de despliegue controlado | **EN PROGRESO** | — |
+| **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **EN PROGRESO** | — |
 | **13** | Monitoreo, métricas, logs y observabilidad (Actuator, Azure Monitor) | **COMPLETADO** | 02/11/2026 |
 | **14** | Análisis estático de código con CodeQL y seguridad adicional | **COMPLETADO** | 02/11/2026 |
 | **15** | Integración del frontend React Native con el backend en Azure | **COMPLETADO** | 02/11/2026 |
@@ -504,75 +504,43 @@ La validación cloud completó el flujo:
 
 La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container App y PostgreSQL validados, y ambos cómputos detenidos. El siguiente paso es automatizar CI/CD sin iniciar recursos Azure automáticamente.
 
-### FASE 10: GitHub Actions y CI/CD (Completada)
+### FASE 10: GitHub Actions y CI/CD (En progreso)
 
-- CI automático: tests Maven, build Docker `linux/amd64` y escaneo Grype en pull requests y pushes a `main`.
-- CD manual: publicación del tag SHA en `acringenieria.azurecr.io/slate-backend` mediante `workflow_dispatch`.
-- No se automatizará el despliegue ni el inicio de `slate-back-isa` o `slate-db-isa`; ambos permanecen detenidos.
+- CI: tests Maven, build Docker `linux/amd64` y Grype con corte `high`.
+- En pull requests solo se valida; no se publica ni se despliega.
+- En push a `main`, `publish` sube a ACR el artefacto exacto que CI construyó y escaneó.
+- `deploy` actualiza Container Apps únicamente después de CI y publicación.
 - No se modificará `goat-grup-one` ni su repositorio ACR.
 
-#### Implementación y validación
+#### Implementación en curso
 
-- Workflow creado en [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
-- CI: Java 21, Maven tests, Docker `linux/amd64` y Grype con corte `high`.
-- CD: `workflow_dispatch` con input explícito `publish`; publica únicamente en `slate-backend` del ACR.
-- No ejecuta Container Apps ni PostgreSQL y no requiere `Container Apps Contributor`.
-- `.\mvnw.cmd --batch-mode test`: ✅ 50 tests, 0 fallos.
-- Build Docker local `linux/amd64`: ✅ validado con tag temporal `slate-backend:ci-phase10`.
-- YAML y whitespace: ✅ revisión local; `actionlint` no está instalado.
-- Imagen temporal local eliminada después de validar para no conservar espacio innecesario.
+- Workflow en [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
+- La imagen se exporta como artefacto para evitar reconstrucciones divergentes.
+- El deploy usa el SHA completo y verifica la imagen activa y `/actuator/health`.
+- Falta ejecutar el workflow real en GitHub con los permisos Azure de Slate.
 
-La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, versionado y condiciones de despliegue.
+### FASE 11: Versionado y condiciones de despliegue (En progreso)
 
-### FASE 11: Versionado y condiciones de despliegue (Completada)
+- Caso A: push a `main` sin `[deploy]`: CI + publicación ACR, sin deploy.
+- Caso B: push a `main` con `[deploy]`: CI + publicación + deploy.
+- Caso C: `workflow_dispatch` con `deploy=true`: CI + publicación + deploy.
+- No se usa `latest`; la imagen se identifica por SHA completo.
+- El rollback se realiza seleccionando un tag SHA validado.
 
-- Se cerrará la Fase 10 en un commit antes de modificar el workflow.
-- CI no publica automáticamente.
-- La publicación requiere `workflow_dispatch`, el input `publish=true` y el environment `azure-acr`.
-- Las imágenes se identificarán con el SHA completo del commit; no se usará `latest` como referencia de despliegue.
-- No se encenderán PostgreSQL ni Container Apps durante esta fase.
+#### Implementación en curso
 
-#### Implementación
+- El job CD depende de `ci` y `publish`.
+- Los environments `azure-acr` y `azure-deploy` permiten aprobación.
+- Falta ejecutar y comprobar los tres casos en GitHub.
 
-- Commit de cierre de Fase 10: `d3a49c3`.
-- Se confirmó que CI solo ejecuta validación y no publica.
-- Se confirmó que la publicación requiere `workflow_dispatch`, `publish=true` y el environment `azure-acr`.
-- Se documentaron tags SHA, digest ACR, rollback y aprobación manual en [`docs/ci-cd.md`](docs/ci-cd.md).
-- El rollback queda fuera del workflow y requiere autorización explícita para encender recursos.
+### FASE 12: Gestión operativa de Azure Container Apps (En progreso)
 
-#### Validación
-
-- YAML revisado localmente; `actionlint` no está instalado.
-- Tests Maven: ✅ 50 tests, 0 fallos.
-- Build Docker `linux/amd64`: ✅ validado previamente y no se ejecutó publicación.
-- No se encendieron PostgreSQL ni Container Apps.
-
-La Fase 11 queda completada. Próximo paso: Fase 12, gestión operativa de Azure Container Apps.
-
-### FASE 12: Gestión operativa de Azure Container Apps (Completada)
-
-- Recursos actuales: Container App `slate-back-isa` detenida/escalada a cero y PostgreSQL `slate-db-isa` detenido.
-- Alcance autorizado: probar temporalmente start, restart, health y logs; apagar todo al finalizar.
-- No se ejecutarán actualización de imagen, rollback ni eliminación.
-- No se modificará `goat-grup-one`, su entorno ni su repositorio ACR.
-
-#### Implementación y prueba
-
-- Estado/revisions consultados sin modificar `goat-grup-one`.
-- Precio revisado antes de iniciar: Container Apps Consumption cobra por uso; PostgreSQL conserva el costo mensual indicado por el Portal.
-- PostgreSQL inició temporalmente y llegó a `Ready`.
-- Container App quedó `Running`; revision `slate-back-isa--latest` `Healthy`, tráfico 100%.
-- `/actuator/health`: ✅ `UP`; base PostgreSQL: ✅ `UP`.
-- Reactivación mediante `az containerapp update` con la misma imagen: ✅.
-- `az containerapp start` no existe en la CLI instalada.
-- `az containerapp revision restart` devolvió error interno del entorno Express.
-- `az containerapp logs show` devolvió error `eventStreamEndpoint` del entorno/extensión Express.
-- Se documentaron alternativas en [`docs/azure.md`](docs/azure.md): Portal, actualización de revision, Log stream y Log Analytics.
-- No se ejecutaron actualización de imagen, rollback ni eliminación.
-
-La Fase 12 queda completada para el alcance autorizado. La Container App queda
-encendida temporalmente para que el usuario la apague desde el Portal; PostgreSQL
-debe permanecer detenido. Próximo paso: Fase 13, monitoreo y observabilidad.
+- `script_az.py` incluye deploy, start/stop por CLI o REST, restart con
+  fallback, listado de revisiones, rollback, logs y eliminación confirmada.
+- Se documentan las limitaciones de `az containerapp logs show` y del entorno
+  Express, con alternativas en Portal/Log Analytics.
+- Falta validar las operaciones sobre la Container App Slate activa y registrar
+  sus resultados reales.
 
 ### FASE 13: Monitoreo y observabilidad (Completada)
 
@@ -631,8 +599,8 @@ El cambio de `pom.xml` queda listo para commit antes de iniciar la Fase 14.
 
 - `.\mvnw.cmd --batch-mode test`: ✅ 52 tests, 0 fallos.
 - `git diff --check`: ✅ sin errores.
-- El workflow conserva la publicación manual ACR-only y no contiene pasos de
-  despliegue o activación de Azure.
+- El workflow de CodeQL no publica imágenes ni despliega Azure; el workflow
+  CI/CD separado contiene el despliegue controlado de las fases 10–11.
 - `actionlint` no está instalado en el host; la estructura YAML fue revisada
   manualmente.
 - No se modificaron proyectos originales ni se encendieron recursos Azure.

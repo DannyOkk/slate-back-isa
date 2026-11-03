@@ -65,43 +65,61 @@ Se ejecuta en cada pull request y en cada push a `main`. Ejecuta:
 3. Build Docker para `linux/amd64`.
 4. Escaneo Grype con severidad mínima `high`; vulnerabilidades altas o críticas hacen fallar el job.
 
-### Publicación manual
+### Publicación y despliegue condicionado
 
-La publicación solo está disponible mediante `workflow_dispatch`. En GitHub Actions se debe ejecutar el workflow y activar el input **Publish the tested image to ACR**. El job espera a que CI finalice correctamente y publica:
+En cada `push` a `main`, el job `ci` valida y el job `publish` publica la misma
+imagen escaneada en ACR. En un `pull_request`, solo se ejecuta la validación.
+También se puede ejecutar el workflow con `workflow_dispatch`; el input
+`deploy` controla si se solicita CD.
 
 ```text
 acringenieria.azurecr.io/slate-backend:<commit-sha>
 ```
 
-La etiqueta usa el SHA completo del commit y es inmutable por convención operativa. El workflow no ejecuta `az containerapp update`, no inicia PostgreSQL y no cambia réplicas; por lo tanto, la publicación no enciende recursos de cómputo ni despliega automáticamente la aplicación.
+La etiqueta usa el SHA completo del commit. El job `ci` exporta la imagen
+construida y escaneada como artefacto; `publish` la carga y la sube sin
+reconstruirla. Así, la imagen publicada es exactamente la que pasó tests,
+Docker y Grype.
+
+El job `deploy` depende de `ci` y `publish` y ejecuta `az containerapp update`
+solo en estos casos:
+
+- `push` a `main` cuyo mensaje contiene `[deploy]`.
+- `workflow_dispatch` con `deploy=true`.
+
+Después comprueba que Container Apps use el mismo tag SHA y consulta
+`/actuator/health`. Un push normal sin `[deploy]` publica, pero no actualiza la
+Container App.
 
 ### Costos y límites
 
 - Publicar una imagen agrega almacenamiento marginal al ACR existente.
 - No se crea un ACR nuevo.
 - No se modifica el repositorio `goat-grup-one`.
-- El Service Principal solo necesita `AcrPush` para este job.
-- El environment protegido opcional `azure-acr` puede requerir aprobación antes de publicar.
-- `AZURE_RESOURCE_GROUP` se conserva como secreto para futuras operaciones, pero esta versión no lo usa porque no despliega Container Apps.
+- El Service Principal necesita `AcrPush` para publicación y permiso de
+  actualización de la Container App para CD.
+- Los environments `azure-acr` y `azure-deploy` pueden requerir aprobación
+  antes de cada operación.
+- `AZURE_RESOURCE_GROUP` y `AZURE_ACR_NAME` se usan en el deploy para evitar
+  nombres de infraestructura hardcodeados en el workflow.
 
 ### Validación local
 
-La implementación fue validada sin ejecutar GitHub Actions ni modificar Azure:
+La implementación local fue validada con:
 
-- `.\mvnw.cmd --batch-mode test`: 50 tests exitosos.
-- Build Docker local `linux/amd64`: exitoso.
+- `.\mvnw.cmd --batch-mode test`: 52 tests exitosos.
+- Compilación del script: `python -m py_compile .\script_az.py`.
 - `git diff --check`: sin errores.
-- `actionlint` no estaba instalado en el host; la estructura del workflow fue revisada mediante el diff.
+- `actionlint` no está instalado en el host; el YAML fue revisado
+  estructuralmente. La validación definitiva del workflow se hará en GitHub.
 
 La ejecución real del workflow CodeQL en GitHub fue verificada en el run
 [`41492423754`](https://github.com/DannyOkk/slate-back-isa/actions/runs/41492423754):
 el job `Analyze Java` terminó correctamente, incluyendo inicialización,
 compilación y análisis CodeQL. La API disponible no permite leer los nombres de
-secrets del repositorio; por eso la presencia de los secrets de publicación ACR
-El usuario confirmó que los secrets de GitHub fueron creados. La API no permite
-leer sus valores ni nombres de forma verificable, por lo que la validación de
-publicación sigue dependiendo de una ejecución manual autorizada con
-`publish=true`.
+secrets del repositorio; el usuario confirmó que los secrets requeridos fueron
+creados. La publicación y el deploy deben verificarse ejecutando los casos A, B
+y C en GitHub Actions.
 
 ## Fase 14: CodeQL y revisión de seguridad
 
@@ -134,12 +152,13 @@ dependencias y vulnerabilidades de la imagen.
 
 | Escenario | Evento | Publica en ACR | Enciende Azure |
 |---|---|---:|---:|
-| CI sin publicación | Pull request o push a `main` | No | No |
-| Publicación controlada | `workflow_dispatch` con `publish=true` | Sí | No |
-| Revisión manual | Environment `azure-acr` con aprobación, si se configura | Sí, después de aprobar | No |
+| Caso A: CI sin deploy | `push` a `main` sin `[deploy]` | Sí | No |
+| Caso B: CI + CD | `push` a `main` con `[deploy]` | Sí | Sí |
+| Caso C: ejecución manual | `workflow_dispatch` con `deploy=true` | Sí | Sí |
 
-El workflow no tiene un camino automático hacia Container Apps. Publicar una
-imagen en ACR no inicia la aplicación ni PostgreSQL.
+Un `pull_request` solo ejecuta CI. Publicar una imagen en ACR no inicia
+PostgreSQL; el deploy solo actualiza la Container App y requiere que la base
+esté disponible para que el health check sea exitoso.
 
 ### Tags y digest
 
@@ -167,9 +186,9 @@ az acr repository show `
 ### Rollback
 
 El rollback consiste en seleccionar un tag SHA anterior que ya haya sido
-validado y actualizar manualmente la Container App para referenciarlo. Esa
-operación queda fuera del workflow de esta fase y requiere que PostgreSQL y la
-Container App se enciendan explícitamente, con autorización de costo.
+validado y actualizar la Container App para referenciarlo. Puede hacerse con
+`script_az.py` o con el comando manual documentado; el workflow CD normal
+despliega el SHA del commit actual y no recibe un tag arbitrario.
 
 Antes de cualquier rollback hay que comprobar:
 
@@ -180,7 +199,6 @@ Antes de cualquier rollback hay que comprobar:
 
 ### Protección del environment
 
-Se recomienda crear el environment `azure-acr` en **Settings → Environments** y
-configurar revisores obligatorios. El job `publish` usa ese environment, por lo
-que una aprobación puede bloquear la publicación incluso cuando el input
-`publish=true` fue seleccionado.
+Se recomienda crear los environments `azure-acr` y `azure-deploy` en
+**Settings → Environments** y configurar revisores obligatorios. Una aprobación
+puede bloquear la publicación o el deploy antes de tocar Azure.

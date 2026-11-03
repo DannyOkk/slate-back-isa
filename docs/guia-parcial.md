@@ -49,15 +49,16 @@
 27. **¿Qué corrige CodeQL?** Detecta patrones de seguridad y errores de código
    mediante análisis estático.
 28. **¿Cuándo corre CI?** En pull requests y pushes a `main`.
-29. **¿Cuándo se publica a ACR?** Solo mediante `workflow_dispatch` y
-   `publish=true`.
+29. **¿Cuándo se publica a ACR?** En pushes a `main` y en ejecuciones manuales;
+   los pull requests solo validan.
 30. **¿Por qué no usar `latest`?** Porque es mutable; los tags SHA identifican
    exactamente el commit.
 31. **¿Qué es rollback?** Volver manualmente a un tag SHA validado anterior.
-32. **¿Qué permisos tiene el Service Principal?** Reader sobre el grupo y
-   AcrPush sobre el registro, sin permisos amplios de suscripción.
-33. **¿Por qué no desplegar automáticamente Azure?** Para controlar costos y
-   exigir autorización explícita.
+32. **¿Qué permisos tiene el Service Principal?** Reader sobre el grupo,
+   AcrPush sobre el registro y permiso mínimo para actualizar la Container App
+   Slate; no permisos amplios de suscripción.
+33. **¿Cuándo se despliega Azure?** Solo con `[deploy]` en un push a `main` o
+   con `workflow_dispatch` y `deploy=true`; un push normal solo publica.
 34. **¿Qué servicios Azure usa Slate?** ACR, Container Apps, PostgreSQL
    Flexible Server y el entorno de observabilidad existente.
 35. **¿Cómo se controlan costos?** Se calcula precio antes de crear recursos y

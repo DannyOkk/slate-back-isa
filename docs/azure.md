@@ -242,8 +242,9 @@ az postgres flexible-server show `
 
 ### Iniciar y detener
 
-En esta suscripción/entorno, `az containerapp start` no está disponible. Para
-activar la aplicación:
+El script `script_az.py` intenta primero `az containerapp start`. Si la CLI
+instalada no incluye ese comando, usa la acción REST equivalente mediante
+`az rest`. Para activar la aplicación manualmente desde PowerShell:
 
 ```powershell
 az containerapp update `
@@ -283,18 +284,21 @@ az postgres flexible-server stop `
   --only-show-errors
 ```
 
-También se puede usar el botón **Stop/Start** del Portal cuando esté
-disponible. No se debe confundir escalar a cero con eliminar la aplicación.
+El script también usa la acción REST `stop` cuando la CLI no trae
+`az containerapp stop`. Como alternativa visual se puede usar el botón
+**Stop/Start** del Portal. No se debe confundir escalar a cero con eliminar la
+aplicación.
 
 ### Reiniciar
 
-En el Portal: **Container App → Revisions → seleccionar revision activa →
-Restart**.
+En el script: **Ciclo de vida → Reiniciar servicio**. Primero intenta
+`az containerapp revision restart`; si el entorno devuelve error, fuerza una
+nueva revisión usando la misma imagen. En el Portal: **Container App →
+Revisions → seleccionar revision activa → Restart**.
 
-La operación CLI `az containerapp revision restart` fue probada y devolvió un
-error interno en este entorno Express. La alternativa validada es ejecutar
-`az containerapp update` con la misma imagen y `min-replicas 1`, y comprobar la
-revision Healthy y `/actuator/health`.
+La operación CLI puede devolver un error interno en el entorno Express; el
+fallback del script ejecuta `az containerapp update` con la misma imagen. En
+ambos casos hay que comprobar la revisión Healthy y `/actuator/health`.
 
 ### Health y logs
 
@@ -304,9 +308,9 @@ Invoke-RestMethod `
   -Method Get
 ```
 
-En este entorno, `az containerapp logs show` falla con `eventStreamEndpoint`
-debido a una limitación de la extensión/entorno Express. Para consultar logs,
-usar el Portal:
+Si `az containerapp logs show` falla con `eventStreamEndpoint` por una
+limitación de la extensión/entorno Express, el script informa el error y se
+debe usar el Portal:
 
 **Container App → Monitoring → Log stream** o **Monitoring → Logs**.
 
@@ -352,7 +356,10 @@ retención requerida de datos y configuración.
 - Revision `slate-back-isa--latest`: `Healthy`, tráfico 100%.
 - `/actuator/health`: `UP`; componente `db`: `UP`.
 - La reactivación mediante `update` con la misma imagen fue exitosa.
-- `az containerapp revision restart` y `az containerapp logs show` presentaron
-  limitaciones del entorno Express; quedaron documentadas sus alternativas.
+- El script incluye acciones de start/stop por CLI o REST, restart con fallback,
+  listado de revisiones, rollback y eliminación protegida por confirmación.
+- `az containerapp revision restart` y `az containerapp logs show` pueden
+  presentar limitaciones del entorno Express; quedaron documentadas sus
+  alternativas.
 - La app queda encendida temporalmente para que el usuario la apague desde el
   Portal al finalizar la revisión. PostgreSQL no debe quedar encendido.

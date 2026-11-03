@@ -175,9 +175,11 @@ python .\script_az.py
 El script usa la sesión existente de `az login` cuando no hay credenciales de
 Service Principal locales. Para crear una Container App nueva se requiere un
 Service Principal completo; para actualizar la app Slate existente conserva las
-credenciales ACR ya configuradas. Los defaults son puerto `8080`, `minReplicas=0`
-y `maxReplicas=1` para limitar consumo. No se debe ejecutar la opción de deploy
-ni iniciar recursos sin revisar previamente el costo.
+credenciales ACR ya configuradas. Incluye deploy, start/stop, restart, listado
+de revisiones, rollback, logs y eliminación con confirmación. Los defaults son
+puerto `8080`, `minReplicas=0` y `maxReplicas=1` para limitar consumo. Antes de
+ejecutar opciones que enciendan recursos se debe revisar el costo; el script
+usa `az rest` como fallback cuando la CLI no expone start/stop.
 
 ---
 

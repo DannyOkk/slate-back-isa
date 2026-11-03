@@ -891,7 +891,7 @@ class DockerOps:
 # Operaciones Azure Container Apps
 # ---------------------------------------------------------------------------
 class ContainerAppsOps:
-    """Crear/deploy, parar, iniciar, listar, eliminar y logs de la Container App."""
+    """Gestiona deploy, ciclo de vida, revisiones, rollback y logs de Slate."""
 
     def __init__(self, config: Config):
         self.config = config
@@ -1215,6 +1215,72 @@ class ContainerAppsOps:
         print(out)
         return True
 
+    def list_revisions(self) -> bool:
+        """Lista revisiones, estado de salud, tráfico e imagen de Slate."""
+        section(f"Revisiones — {self.config.app_name}")
+        code, out = run_cmd([
+            "az", "containerapp", "revision", "list",
+            "--name", self.config.app_name,
+            "--resource-group", self.config.resource_group,
+            "--query",
+            "[].{Name:name,Active:properties.active,"
+            "Health:properties.healthState,"
+            "Traffic:properties.trafficWeight,"
+            "Image:properties.template.containers[0].image}",
+            "-o", "table",
+        ], timeout=60)
+        if code != 0:
+            log_err("No se pudieron consultar las revisiones")
+            return False
+        print(out or "No hay revisiones disponibles.")
+        return True
+
+    def restart(self) -> bool:
+        """Reinicia la revisión activa y usa update como fallback compatible."""
+        section(f"Reiniciando — {self.config.app_name}")
+        if not self.exists():
+            log_err(f"La app '{self.config.app_name}' no existe")
+            return False
+        code, revision = run_cmd([
+            "az", "containerapp", "revision", "list",
+            "--name", self.config.app_name,
+            "--resource-group", self.config.resource_group,
+            "--query", "[?properties.active==`true`][0].name",
+            "-o", "tsv",
+        ], timeout=60)
+        if code != 0 or not revision:
+            log_err("No se pudo identificar la revisión activa")
+            return False
+        if not confirm(f"¿Reiniciar la revisión activa '{revision}'?"):
+            log_info("Operación cancelada")
+            return True
+        code = run_stream([
+            "az", "containerapp", "revision", "restart",
+            "--name", self.config.app_name,
+            "--resource-group", self.config.resource_group,
+            "--revision", revision,
+        ])
+        if code == 0:
+            log_ok("Reinicio solicitado")
+            return True
+        log_warn("revision restart falló; se fuerza una nueva revisión con la misma imagen")
+        code, image = run_cmd([
+            "az", "containerapp", "show",
+            "--name", self.config.app_name,
+            "--resource-group", self.config.resource_group,
+            "--query", "properties.template.containers[0].image",
+            "-o", "tsv",
+        ], timeout=30)
+        if code != 0 or not image:
+            log_err("No se pudo obtener la imagen activa para el fallback")
+            return False
+        return run_stream([
+            "az", "containerapp", "update",
+            "--name", self.config.app_name,
+            "--resource-group", self.config.resource_group,
+            "--image", image,
+        ]) == 0
+
     def delete_app(self) -> bool:
         """
         OP 3c: Elimina una Container App elegida por el usuario.
@@ -1322,7 +1388,7 @@ def print_menu() -> None:
     print()
     print(f"  {Color.BOLD}1{Color.RESET}) {Color.info('Construir y Subir')}   build local + push al ACR (telemetría)")
     print(f"  {Color.BOLD}2{Color.RESET}) {Color.info('Deploy')}             crear/actualizar Container App + URL pública")
-    print(f"  {Color.BOLD}3{Color.RESET}) {Color.info('Parar / Iniciar / Listar / Eliminar')}   gestión de instancias")
+    print(f"  {Color.BOLD}3{Color.RESET}) {Color.info('Ciclo de vida')}     parar / iniciar / reiniciar / listar / eliminar")
     print(f"  {Color.BOLD}4{Color.RESET}) {Color.info('Pull')}               bajar imagen del ACR a la máquina local")
     print(f"  {Color.BOLD}5{Color.RESET}) {Color.info('Logs y Telemetría')}   streaming de trazas en tiempo real")
     print(f"  {Color.BOLD}6{Color.RESET}) {Color.info('Reconfigurar')}        volver a elegir infraestructura vía az CLI")
@@ -1338,7 +1404,9 @@ def manage_instances(ops: ContainerAppsOps) -> None:
         print(f"  {Color.BOLD}a{Color.RESET}) {Color.info('Parar servicio')}    detener la app (no consume créditos)")
         print(f"  {Color.BOLD}b{Color.RESET}) {Color.info('Iniciar servicio')}  reanudar la app detenida")
         print(f"  {Color.BOLD}c{Color.RESET}) {Color.info('Listar instancias')}  tabla de apps del grupo de recursos")
-        print(f"  {Color.BOLD}d{Color.RESET}) {Color.info('Eliminar instancia')}  prompt de selección + confirmación")
+        print(f"  {Color.BOLD}d{Color.RESET}) {Color.info('Reiniciar servicio')}  revision restart o nueva revision")
+        print(f"  {Color.BOLD}e{Color.RESET}) {Color.info('Listar revisiones')}  salud, tráfico e imagen")
+        print(f"  {Color.BOLD}f{Color.RESET}) {Color.info('Eliminar instancia')}  prompt de selección + confirmación")
         print(f"  {Color.BOLD}0{Color.RESET}) {Color.error('Volver al menú principal')}")
 
         try:
@@ -1354,11 +1422,15 @@ def manage_instances(ops: ContainerAppsOps) -> None:
         elif choice == "c":
             ops.list_apps()
         elif choice == "d":
+            ops.restart()
+        elif choice == "e":
+            ops.list_revisions()
+        elif choice == "f":
             ops.delete_app()
         elif choice == "0":
             return
         else:
-            log_warn("Opción inválida — usá a, b, c, d o 0")
+            log_warn("Opción inválida — usá a, b, c, d, e, f o 0")
 
 
 # ---------------------------------------------------------------------------
