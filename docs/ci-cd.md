@@ -98,8 +98,10 @@ La ejecución real del workflow CodeQL en GitHub fue verificada en el run
 el job `Analyze Java` terminó correctamente, incluyendo inicialización,
 compilación y análisis CodeQL. La API disponible no permite leer los nombres de
 secrets del repositorio; por eso la presencia de los secrets de publicación ACR
-queda pendiente de confirmación desde **Settings → Secrets and variables →
-Actions** o mediante una ejecución manual autorizada de `publish=true`.
+El usuario confirmó que los secrets de GitHub fueron creados. La API no permite
+leer sus valores ni nombres de forma verificable, por lo que la validación de
+publicación sigue dependiendo de una ejecución manual autorizada con
+`publish=true`.
 
 ## Fase 14: CodeQL y revisión de seguridad
 

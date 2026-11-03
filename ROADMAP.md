@@ -77,16 +77,22 @@ Actuator, HikariCP metrics, Azure Monitor / Log Analytics, 12 factores (III, V, 
 ### ~~18. ETAPA 14: CODEQL Y SEGURIDAD ADICIONAL~~ - `[x] COMPLETADO`
 Análisis estático de código SAST con CodeQL, consultas parametrizadas, validación de inputs.
 
-### 19. ETAPA 15: INTEGRACIÓN CON REACT NATIVE - `[ ] PENDIENTE`
+### ~~19. ETAPA 15: INTEGRACIÓN CON REACT NATIVE~~ - `[x] COMPLETADO`
 Configuración de URL HTTPS remota de Azure en `slate-front-isa`, prueba de login, almacenamiento de token en SecureStore y consumo de endpoints protegidos.
 
-### 20. ETAPA 16: VALIDACIÓN COMPLETA - `[ ] PENDIENTE`
+### ~~20. ETAPA 16: VALIDACIÓN COMPLETA~~ - `[x] COMPLETADO`
 Auditoría final contra la matriz de 43 requisitos.
 
-### 21. ETAPA 17: PREPARACIÓN PARA EL PARCIAL - `[ ] PENDIENTE`
-Guía de defensa, 50 preguntas técnicas con respuesta oral y práctica, simulacro de examen en vivo.
+### ~~21. ETAPA 17: PREPARACIÓN PARA EL PARCIAL~~ - `[x] COMPLETADO`
+Se creó [`docs/guia-parcial.md`](docs/guia-parcial.md) con 50 preguntas,
+respuestas breves y una demostración sugerida. El simulacro oral queda como
+actividad del estudiante.
 
-### 22. DOCUMENTACIÓN OBLIGATORIA
+### 22. ETAPA 18: CIERRE FINAL Y PREPARACIÓN DE PRODUCCIÓN - `[~] EN PROGRESO`
+Vinculación EAS, auditoría de pendientes históricos, documentación final y
+preparación de producción sin publicar en tiendas.
+
+### 23. DOCUMENTACIÓN OBLIGATORIA
 README.md y carpeta `docs/` con arquitectura, docker, azure, ci-cd, seguridad, monitoreo y guia-parcial.
 
 </details>
@@ -498,7 +504,7 @@ La validación cloud completó el flujo:
 
 La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container App y PostgreSQL validados, y ambos cómputos detenidos. El siguiente paso es automatizar CI/CD sin iniciar recursos Azure automáticamente.
 
-### FASE 10: GitHub Actions y CI/CD (En progreso)
+### FASE 10: GitHub Actions y CI/CD (Completada)
 
 - CI automático: tests Maven, build Docker `linux/amd64` y escaneo Grype en pull requests y pushes a `main`.
 - CD manual: publicación del tag SHA en `acringenieria.azurecr.io/slate-backend` mediante `workflow_dispatch`.
@@ -518,7 +524,7 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 
 La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, versionado y condiciones de despliegue.
 
-### FASE 11: Versionado y condiciones de despliegue (En progreso)
+### FASE 11: Versionado y condiciones de despliegue (Completada)
 
 - Se cerrará la Fase 10 en un commit antes de modificar el workflow.
 - CI no publica automáticamente.
@@ -543,7 +549,7 @@ La Fase 10 queda completada para el alcance ACR-only. Próximo paso: Fase 11, ve
 
 La Fase 11 queda completada. Próximo paso: Fase 12, gestión operativa de Azure Container Apps.
 
-### FASE 12: Gestión operativa de Azure Container Apps (En progreso)
+### FASE 12: Gestión operativa de Azure Container Apps (Completada)
 
 - Recursos actuales: Container App `slate-back-isa` detenida/escalada a cero y PostgreSQL `slate-db-isa` detenido.
 - Alcance autorizado: probar temporalmente start, restart, health y logs; apagar todo al finalizar.
@@ -568,7 +574,7 @@ La Fase 12 queda completada para el alcance autorizado. La Container App queda
 encendida temporalmente para que el usuario la apague desde el Portal; PostgreSQL
 debe permanecer detenido. Próximo paso: Fase 13, monitoreo y observabilidad.
 
-### FASE 13: Monitoreo y observabilidad (En progreso)
+### FASE 13: Monitoreo y observabilidad (Completada)
 
 - Baseline: Actuator ya exponía health/info/metrics y Hikari tenía pool `SlateHikariPool`.
 - Se mantendrán health/readiness/liveness públicos para probes.
@@ -633,7 +639,7 @@ El cambio de `pom.xml` queda listo para commit antes de iniciar la Fase 14.
 
 La Fase 14 queda completada. Próximo paso: Fase 15, integración con React Native.
 
-### FASE 15: Integración React Native con Azure (En progreso)
+### FASE 15: Integración React Native con Azure (Completada)
 
 - El frontend `slate-front-isa` se conectará mediante `EXPO_PUBLIC_API_URL` a la
   URL HTTPS de `slate-back-isa`.
@@ -660,7 +666,7 @@ La Fase 14 queda completada. Próximo paso: Fase 15, integración con React Nati
 La Fase 15 queda completada. Próximo paso: Fase 16, validación visual y
 preparación final de entrega del frontend.
 
-### FASE 16: Validación visual y entrega del frontend (En progreso)
+### FASE 16: Validación visual y entrega del frontend (Completada)
 
 - Se prioriza Expo Web para la validación automatizada.
 - Se usará temporalmente Azure ya encendido, sin crear recursos ni cambiar
@@ -690,7 +696,7 @@ notificaciones locales y selector nativo de fecha/hora. Azure permanece
 encendido porque fue activado por el usuario; puede apagarse al finalizar la
 prueba manual.
 
-### FASE 17: Preparación EAS (En progreso)
+### FASE 17: Preparación EAS (Completada)
 
 - Se preparará EAS sin generar APK/AAB ni publicar en tiendas.
 - Se definirá un identificador Android estable y perfiles reproducibles para
@@ -721,3 +727,13 @@ los futuros builds.
 La Fase 17 queda completada como preparación local. El vínculo de la cuenta
 Expo y cualquier build cloud quedan deliberadamente para una fase posterior,
 cuando el usuario autentique EAS.
+
+### FASE 18: Cierre final y preparación de producción (En progreso)
+
+- Se auditan pendientes históricos y se sincronizan los estados de la sección
+  maestra con las fases detalladas.
+- Se incorpora la guía de defensa de 50 preguntas.
+- Se vinculará EAS y se validará el `projectId` cuando la cuenta Expo esté
+  autenticada.
+- Se dejará producción preparada sin generar APK/AAB ni publicar en tiendas.
+- Azure se consultará solo con health check y no se crearán recursos.
