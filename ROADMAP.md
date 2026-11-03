@@ -151,9 +151,9 @@ Este documento se mantiene actualizado antes y después de cada fase como consta
 | **12** | Gestión operativa de Azure Container Apps (start, stop, logs, rollback) | **COMPLETADO** | 02/11/2026 |
 | **13** | Monitoreo, métricas, logs y observabilidad (Actuator, Azure Monitor) | **COMPLETADO** | 02/11/2026 |
 | **14** | Análisis estático de código con CodeQL y seguridad adicional | **COMPLETADO** | 02/11/2026 |
-| **15** | Integración del frontend React Native con el backend en Azure | PENDIENTE | - |
-| **16** | Validación integral de requisitos y matriz de pruebas | PENDIENTE | - |
-| **17** | Documentación final y preparación para la defensa del examen parcial | PENDIENTE | - |
+| **15** | Integración del frontend React Native con el backend en Azure | **COMPLETADO** | 02/11/2026 |
+| **16** | Validación integral de requisitos y matriz de pruebas | **COMPLETADO** | 02/11/2026 |
+| **17** | Documentación final y preparación para la defensa del examen parcial | **COMPLETADO** | 02/11/2026 |
 
 ---
 
@@ -717,9 +717,9 @@ prueba manual.
 - `npm run lint`: ✅.
 - `npx tsc --noEmit`: ✅.
 - Health Azure: ✅ `UP`; no se crearon ni modificaron recursos.
-- `eas-cli whoami`: cuenta no autenticada. La validación online de `eas config`
-  quedó pendiente hasta ejecutar `npx eas-cli@latest login`; no se inventó un
-  `projectId` ni se guardaron credenciales.
+- La cuenta EAS quedó autenticada durante la Fase 18 y la validación online de
+  `eas config` fue completada con el `projectId` real; no se guardaron
+  credenciales.
 
 El paquete Android se ajustó posteriormente a `com.slate.app`, solicitado para
 los futuros builds.
@@ -735,8 +735,8 @@ posterior opcional.
 - Se incorpora la guía de defensa de 50 preguntas.
 - EAS quedó vinculado bajo la cuenta `dannyokk` con el `projectId`
   `1cbd6c69-df05-472c-ae3f-e851afedc5cc`.
-- Se dejará producción preparada sin generar APK/AAB ni publicar en tiendas.
-- Azure se consultará solo con health check y no se crearán recursos.
+- Se dejó producción preparada sin generar APK/AAB ni publicar en tiendas.
+- Azure solo se consultó mediante health check y no se crearon recursos.
 
 #### Vinculación EAS verificada
 
