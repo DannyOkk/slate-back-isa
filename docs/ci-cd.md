@@ -161,6 +161,10 @@ Un `pull_request` solo ejecuta CI. Publicar una imagen en ACR no inicia
 PostgreSQL; el deploy solo actualiza la Container App y requiere que la base
 esté disponible para que el health check sea exitoso.
 
+La ejecución de referencia del Caso A quedó validada en GitHub Actions con el
+commit `1c138de`: CI y publicación finalizaron correctamente y CD quedó
+omitido por no contener `[deploy]`.
+
 ### Tags y digest
 
 Cada imagen usa el SHA completo del commit:
