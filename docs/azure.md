@@ -138,7 +138,7 @@ Asignaciones verificadas:
 |---|---|---|
 | `Reader` | Resource Group `universidad` | Asignado |
 | `AcrPush` | Registry `acringenieria` | Asignado |
-| `Container Apps Contributor` | Futura Container App Slate | Pendiente hasta que exista la app |
+| `Container Apps Contributor` | Resource Group `universidad` | Asignado al existir `slate-back-isa` |
 
 El `clientSecret` fue regenerado y guardado temporalmente fuera del repositorio en la máquina local. Debe copiarse manualmente a GitHub como `AZURE_CLIENT_SECRET` y eliminarse inmediatamente del archivo temporal. No se debe pegar en el repositorio, issues, commits, chat ni logs.
 

@@ -517,7 +517,13 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 - Workflow en [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml).
 - La imagen se exporta como artefacto para evitar reconstrucciones divergentes.
 - El deploy usa el SHA completo y verifica la imagen activa y `/actuator/health`.
-- Falta ejecutar el workflow real en GitHub con los permisos Azure de Slate.
+- El Caso A se validó en el run `41662196974`: CI y publicación exitosos,
+  deploy omitido correctamente.
+- El Caso B ejecutó CI y publicación correctamente en el run `41663188748`,
+  pero el deploy fue rechazado por falta de `Microsoft.App/containerApps/write`.
+- Se asignó `Container Apps Contributor` al Service Principal de Slate sobre
+  el Resource Group `universidad`; no se crearon recursos ni se modificaron
+  proyectos originales. Falta reejecutar el Caso B para confirmar el permiso.
 
 ### FASE 11: Versionado y condiciones de despliegue (En progreso)
 
@@ -531,7 +537,8 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 
 - El job CD depende de `ci` y `publish`.
 - Los environments `azure-acr` y `azure-deploy` permiten aprobación.
-- Falta ejecutar y comprobar los tres casos en GitHub.
+- Caso A comprobado; Caso B comprobado hasta la publicación y bloqueado solo
+  por RBAC, ya corregido; Caso C todavía pendiente de ejecución.
 
 ### FASE 12: Gestión operativa de Azure Container Apps (En progreso)
 
@@ -539,8 +546,11 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
   fallback, listado de revisiones, rollback, logs y eliminación confirmada.
 - Se documentan las limitaciones de `az containerapp logs show` y del entorno
   Express, con alternativas en Portal/Log Analytics.
-- Falta validar las operaciones sobre la Container App Slate activa y registrar
-  sus resultados reales.
+- La Container App Slate continúa operativa y la imagen del Caso B se actualizó
+  correctamente mediante Azure CLI local después de corregir RBAC.
+- El `Log stream error: 400` del Portal se considera una limitación del canal
+  de streaming; los logs de Spring Boot muestran inicio correcto.
+- Falta validar y registrar en GitHub las operaciones restantes y el Caso C.
 
 ### FASE 13: Monitoreo y observabilidad (Completada)
 

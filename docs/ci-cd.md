@@ -6,8 +6,9 @@ El pipeline futuro usará el Service Principal `slate-back-isa-ci`. Tiene única
 
 - `Reader` sobre el Resource Group `universidad`.
 - `AcrPush` sobre `acringenieria`.
+- `Container Apps Contributor` sobre el Resource Group `universidad`, necesario
+  para actualizar la Container App propia de Slate.
 - Sin `Owner`, `User Access Administrator` ni `Contributor` de suscripción.
-- Sin permiso de Container Apps hasta que se cree la Container App propia de Slate.
 
 No usar el Service Principal existente con `Contributor`, porque sus permisos son más amplios y su propósito pertenece a la infraestructura previa.
 
@@ -91,6 +92,13 @@ solo en estos casos:
 Después comprueba que Container Apps use el mismo tag SHA y consulta
 `/actuator/health`. Un push normal sin `[deploy]` publica, pero no actualiza la
 Container App.
+
+La primera ejecución real del Caso B confirmó CI y publicación, pero el job de
+deploy fue rechazado por RBAC (`Microsoft.App/containerApps/write`). Se corrigió
+asignando `Container Apps Contributor` al Service Principal de Slate en el
+Resource Group `universidad`. La actualización equivalente con Azure CLI local
+finalizó correctamente usando la misma imagen SHA; queda repetir el workflow
+para cerrar la validación del Caso B.
 
 ### Costos y límites
 
