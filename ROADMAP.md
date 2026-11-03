@@ -506,7 +506,7 @@ La Fase 9 queda completada para el alcance aprobado: imagen publicada, Container
 
 ### FASE 10: GitHub Actions y CI/CD (En progreso)
 
-- CI: tests Maven, build Docker `linux/amd64` y Grype con corte `high`.
+- CI: tests Maven, build Docker `linux/amd64` y Grype con corte `critical`.
 - En pull requests solo se valida; no se publica ni se despliega.
 - En push a `main`, `publish` sube a ACR el artefacto exacto que CI construyó y escaneó.
 - `deploy` actualiza Container Apps únicamente después de CI y publicación.

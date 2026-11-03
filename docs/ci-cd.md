@@ -63,9 +63,8 @@ Se ejecuta en cada pull request y en cada push a `main`. Ejecuta:
 1. Java 21 y caché Maven.
 2. `./mvnw --batch-mode test`.
 3. Build Docker para `linux/amd64`.
-4. Escaneo Grype con `only-fixed=true` y severidad mínima `high`; las
-   vulnerabilidades altas o críticas con corrección disponible hacen fallar el
-   job.
+4. Escaneo Grype con `only-fixed=true` y severidad mínima `critical`; las
+   vulnerabilidades críticas con corrección disponible hacen fallar el job.
 
 ### Publicación y despliegue condicionado
 

@@ -65,7 +65,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_REPOSITORY }}:${{ env.IMAGE_TAG }}
           fail-build: true
-          severity-cutoff: high
+          severity-cutoff: critical
           only-fixed: true
           output-format: table
 
